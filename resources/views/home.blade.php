@@ -4,7 +4,13 @@
     <h2>Bienvenido a la Aplicación de Alumnos</h2>
     <p>Esta es una aplicación para gestionar alumnos y grupos.</p>
     
-    <div class="mt-4">
-        <a href="{{ route('alumnos.index') }}" class="btn btn-primary">Ver Alumnos</a>
+    <div class="mt-5 d-flex justify-between">
+        <div class="">
+            <a href="{{ route('alumnos.index') }}" class="btn btn-primary">Ver Alumnos</a>
+        </div>
+
+        <div class="ms-2">
+            <a href="{{ route('grupos.index') }}" class="btn btn-success">Ver Grupos</a>
+        </div>
     </div>
 @endsection

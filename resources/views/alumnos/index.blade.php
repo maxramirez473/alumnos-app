@@ -29,7 +29,6 @@
                             <table class="table table-striped table-hover">
                                 <thead class="table-dark">
                                     <tr>
-                                        <th>ID</th>
                                         <th>Legajo</th>
                                         <th>Nombre</th>
                                         <th>Email</th>
@@ -40,7 +39,6 @@
                                 <tbody>
                                     @foreach($alumnos as $alumno)
                                         <tr>
-                                            <td>{{ $alumno->id }}</td>
                                             <td>{{ $alumno->legajo }}</td>
                                             <td>{{ $alumno->nombre }}</td>
                                             <td>{{ $alumno->email }}</td>

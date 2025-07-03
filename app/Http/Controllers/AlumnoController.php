@@ -20,7 +20,8 @@ class AlumnoController extends Controller
 
     public function create()
     {
-        return view('alumnos.create');
+        $grupos = Grupo::all(); // Obtener todos los grupos para el formulario
+        return view('alumnos.create', compact('grupos'));
     }
 
     public function store(Request $request)
@@ -37,11 +38,12 @@ class AlumnoController extends Controller
     }
 
 
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
+        //dd($request->all());
         $request->validate([
             'nombre' => 'required|string|max:255',
-            'email' => 'required|email|unique:alumnos,email,' . $id,
+            'email' => 'required|email|unique:alumnos,email,' . $request->id,
             'grupo_id' => 'nullable|exists:grupos,id',
         ],
         [
@@ -49,7 +51,7 @@ class AlumnoController extends Controller
             'grupo_id.exists' => 'El grupo seleccionado no existe.',
         ]);
 
-        $alumno = Alumno::findOrFail($id);
+        $alumno = Alumno::findOrFail($request->id); 
         $alumno->update($request->all());
 
         return redirect()->route('alumnos.index')->with('success', 'Alumno actualizado exitosamente.');
