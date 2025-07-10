@@ -12,5 +12,9 @@
         <div class="ms-2">
             <a href="{{ route('grupos.index') }}" class="btn btn-success">Ver Grupos</a>
         </div>
+
+        <div class="ms-2">
+            <a href="{{ route('notas.index') }}" class="btn btn-warning">Ver Notas</a>
+        </div>
     </div>
 @endsection

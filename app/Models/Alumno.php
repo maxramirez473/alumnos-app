@@ -80,7 +80,7 @@ class Alumno extends Model
         return $this->belongsTo('App\Models\Grupo', 'grupo_id');
     }
 
-    public function nota()
+    public function notas()
     {
         return $this->hasMany('App\Models\Nota', 'alumno_id');
     }

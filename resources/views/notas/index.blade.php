@@ -1,13 +1,11 @@
-<!-- filepath: c:\Users\totoPC\Desktop\Alumnos-app\resources\views\alumno\index.blade.php -->
 @extends('layouts.app')
-
 @section('content')
-<div class="container-fluid">
+    <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header">
-                    <h4>Lista de Alumnos</h4>
+                    <h4>Notas</h4>
                 </div>
                 <div class="card-body">
                     @if(session('success'))
@@ -24,41 +22,33 @@
                         </div>
                     @endif
 
-                    @if($alumnos->count() > 0)
+                    @if($notas->count() > 0)
                         <div class="table-responsive">
                             <table class="table table-striped table-hover">
                                 <thead class="table-dark">
                                     <tr>
-                                        <th>Legajo</th>
-                                        <th>Nombre</th>
-                                        <th>Email</th>
-                                        <th>Grupo ID</th>
-                                        <th>Nota</th>
+                                        <th>Concepto</th>
+                                        <th>Valor</th>
+                                        <th>Alumno</th>
+                                        <th>Estado</th>
                                         <th class="text-center">Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach($alumnos as $alumno)
+                                    @foreach($notas as $nota)
                                         <tr>
-                                            <td>{{ $alumno->legajo }}</td>
-                                            <td>{{ $alumno->nombre }}</td>
-                                            <td>{{ $alumno->email }}</td>
-                                            <td>{{ $alumno->grupo->nombre ?? 'Sin asignar' }}</td>
-                                            <td>
-                                                @if($alumno->notas->count() > 0)
-                                                    {{ $alumno->notas->avg('nota') }} <!-- Promedio de notas -->
-                                                @else
-                                                    <span class="text-muted">Sin notas</span>
-                                                @endif
-                                            </td>
+                                            <td>{{ $nota->concepto->nombre }}</td>
+                                            <td>{{ $nota->nota }}</td>
+                                            <td>{{ $nota->alumno->nombre }}</td>
+                                            <td>{{ $nota->estado }}</td>
                                             <td class="">
                                                 <div class=" d-flex justify-content-between" role="group">
-                                                    <a href="{{ route('alumnos.edit', $alumno->id) }}" 
+                                                    <a href="{{ route('notas.edit', $nota->id) }}" 
                                                         class="btn btn-warning btn-sm" 
                                                         title="Editar">
                                                         <i class="fas fa-edit"></i> Editar
                                                     </a>
-                                                    <form action="{{ route('alumnos.destroy', $alumno->id) }}" 
+                                                    <form action="{{ route('notas.destroy', $nota->id) }}" 
                                                             method="POST" 
                                                             class="d-inline"
                                                             onsubmit="return confirm('¿Estás seguro de que quieres eliminar este alumno?')">
@@ -79,24 +69,20 @@
                         </div>
                     @else
                         <div class="alert alert-info text-center">
-                            <h5>No hay alumnos registrados</h5>
-                            <p>Comienza agregando alumnos usando los botones de abajo.</p>
+                            <h5>No hay notas</h5>
                         </div>
                     @endif
 
                     <!-- Botones de acción -->
                     <div class="mt-4 d-flex justify-content-between">
                         <div>
-                            <a href="{{ route('alumnos.create') }}" class="btn btn-primary">
-                                <i class="fas fa-plus"></i> Crear Nuevo Alumno
-                            </a>
-                            <a href="{{ route('alumnos.import.form') }}" class="btn btn-success">
-                                <i class="fas fa-upload"></i> Importar Alumnos
+                            <a href="{{ route('notas.create') }}" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Crear Notas
                             </a>
                         </div>
                         <div>
                             <span class="badge bg-secondary fs-6">
-                                Total de alumnos: {{ $alumnos->count() }}
+                                Total de alumnos: {{ $notas->count() }}
                             </span>
                         </div>
                     </div>
@@ -105,39 +91,4 @@
         </div>
     </div>
 </div>
-
-<!-- Modal de confirmación (opcional, alternativa al confirm de JavaScript) -->
-<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="deleteModalLabel">Confirmar Eliminación</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                ¿Estás seguro de que quieres eliminar este alumno? Esta acción no se puede deshacer.
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <form id="deleteForm" method="POST" class="d-inline">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="btn btn-danger">Eliminar</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-@endsection
-
-@section('scripts')
-<script>
-    // Script opcional para usar el modal en lugar del confirm
-    function confirmDelete(url) {
-        document.getElementById('deleteForm').action = url;
-        var deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
-        deleteModal.show();
-    }
-</script>
 @endsection

@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AlumnoController;
 use App\Http\Controllers\GrupoController;
+use App\Http\Controllers\NotaController;
 
 Route::get('/', function () {
     return view('home');
@@ -24,5 +25,13 @@ Route::post('/grupos', [GrupoController::class, 'store'])->name('grupos.store');
 Route::get('/grupos/{id}/edit', [GrupoController::class, 'edit'])->name('grupos.edit');
 Route::put('/grupos/edit', [GrupoController::class, 'update'])->name('grupos.update');
 Route::delete('/grupos/{id}', [GrupoController::class, 'destroy'])->name('grupos.destroy');
+
+Route::get('/notas', [NotaController::class, 'index'])->name('notas.index');
+Route::get('/notas/create', [NotaController::class, 'create'])->name('notas.create');
+Route::post('/notas', [NotaController::class, 'store'])->name('notas.store');
+Route::get('/notas/{id}/edit', [NotaController::class, 'edit'])->name('notas.edit');
+Route::put('/notas/edit', [NotaController::class, 'update'])->name('notas.update');
+Route::delete('/notas/{id}', [NotaController::class, 'destroy'])->name('notas.destroy');
+
 
 
