@@ -45,4 +45,54 @@ class Grupo extends Model
     {
         return $this->hasMany('App\Models\Alumno', 'grupo_id'); 
     }
+
+    /**
+     * Relación muchos a muchos con entregas a través de la tabla pivote
+     */
+    public function entregas()
+    {
+        return $this->belongsToMany(Entrega::class, 'entrega_grupo')
+                    ->withPivot(['fecha', 'estado', 'observaciones'])
+                    ->withTimestamps();
+    }
+
+    /**
+     * Obtener entregas por estado
+     */
+    public function entregasPorEstado($estado)
+    {
+        return $this->entregas()->wherePivot('estado', $estado);
+    }
+
+    /**
+     * Obtener entregas pendientes
+     */
+    public function entregasPendientes()
+    {
+        return $this->entregasPorEstado('pendiente');
+    }
+
+    /**
+     * Obtener entregas completadas
+     */
+    public function entregasCompletadas()
+    {
+        return $this->entregasPorEstado('completada');
+    }
+
+    /**
+     * Obtener entregas en progreso
+     */
+    public function entregasEnProgreso()
+    {
+        return $this->entregasPorEstado('en_progreso');
+    }
+
+    /**
+     * Obtener entregas retrasadas
+     */
+    public function entregasRetrasadas()
+    {
+        return $this->entregasPorEstado('retrasada');
+    }
 }

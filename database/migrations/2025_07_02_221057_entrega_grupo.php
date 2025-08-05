@@ -15,6 +15,20 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('grupo_id');
             $table->unsignedBigInteger('entrega_id');
+            
+            // Claves foráneas con restricciones de integridad
+            $table->foreign('grupo_id')->references('id')->on('grupos')->onDelete('cascade');
+            $table->foreign('entrega_id')->references('id')->on('entregas')->onDelete('cascade');
+            
+            // Índice único para evitar duplicados
+            $table->unique(['grupo_id', 'entrega_id']);
+            
+            // Campos adicionales útiles para una tabla pivote
+            $table->datetime('fecha')->nullable();
+
+            $table->enum('estado', ['pendiente', 'en_progreso', 'completada', 'retrasada'])->default('pendiente');
+            $table->text('observaciones')->nullable()->comment('Observaciones específicas para este grupo');
+            
             $table->timestamps();
         });
     }
