@@ -32,7 +32,6 @@
                     <div class="card-body text-center">
                         <i class="fas fa-users fa-3x text-primary mb-3"></i>
                         <h5 class="card-title">Gestionar Alumnos</h5>
-                        <p class="card-text">Ver, agregar, editar y eliminar información de alumnos.</p>
                         <a href="{{ route('alumnos.index') }}" class="btn btn-primary">Ver Alumnos</a>
                     </div>
                 </div>
@@ -43,7 +42,6 @@
                     <div class="card-body text-center">
                         <i class="fas fa-layer-group fa-3x text-success mb-3"></i>
                         <h5 class="card-title">Gestionar Grupos</h5>
-                        <p class="card-text">Organizar y administrar grupos de alumnos.</p>
                         <a href="{{ route('grupos.index') }}" class="btn btn-success">Ver Grupos</a>
                     </div>
                 </div>
@@ -54,7 +52,6 @@
                     <div class="card-body text-center">
                         <i class="fas fa-clipboard-list fa-3x text-warning mb-3"></i>
                         <h5 class="card-title">Gestionar Notas</h5>
-                        <p class="card-text">Registrar y seguimiento de calificaciones.</p>
                         <a href="{{ route('notas.index') }}" class="btn btn-warning">Ver Notas</a>
                     </div>
                 </div>

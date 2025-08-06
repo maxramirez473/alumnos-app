@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('password');
             $table->string('rol')->default('user'); // Default role for new users
             $table->rememberToken();
+            $table->string('profile_picture')->nullable(); // Optional profile picture
             $table->timestamps();
         });
 

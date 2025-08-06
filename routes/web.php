@@ -18,6 +18,10 @@ Route::get('/', function () {
     return view('home');
 })->name('home');
 
+Route::get('/sesion', function(){
+    return session()->all(); // Asegúrate de tener una vista auth/session.blade.php
+});
+
 // Rutas protegidas por autenticación
 Route::middleware('auth')->group(function () {
     Route::get('/alumnos', [AlumnoController::class, 'index'])->name('alumnos.index');
