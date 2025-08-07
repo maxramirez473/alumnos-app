@@ -3,90 +3,81 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Entrega extends Model
 {
     protected $fillable = [
-        'nombre',
+        'titulo',
         'descripcion',
+        'fecha_limite',
     ];
+
     protected $table = 'entregas';
-    
+
+    protected $casts = [
+        'fecha_limite' => 'datetime',
+    ];
+
     /**
      * Relación muchos a muchos con grupos a través de la tabla pivote
      */
-    public function grupos()
+    public function grupos(): BelongsToMany
     {
         return $this->belongsToMany(Grupo::class, 'entrega_grupo')
-                    ->withPivot(['fecha', 'estado', 'observaciones'])
+                    ->withPivot(['fecha_entrega', 'calificacion', 'comentarios', 'fecha_calificacion'])
                     ->withTimestamps();
     }
 
     /**
-     * Obtener grupos por estado de entrega
+     * Obtener grupos con entrega completada (que tienen fecha_entrega)
      */
-    public function gruposPorEstado($estado)
+    public function gruposEntregados()
     {
-        return $this->grupos()->wherePivot('estado', $estado);
+        return $this->grupos()->whereNotNull('entrega_grupo.fecha_entrega');
     }
 
     /**
-     * Obtener grupos con entrega pendiente
+     * Obtener grupos con entrega pendiente (que no tienen fecha_entrega)
      */
     public function gruposPendientes()
     {
-        return $this->gruposPorEstado('pendiente');
+        return $this->grupos()->whereNull('entrega_grupo.fecha_entrega');
     }
 
     /**
-     * Obtener grupos con entrega completada
+     * Obtener grupos calificados
      */
-    public function gruposCompletados()
+    public function gruposCalificados()
     {
-        return $this->gruposPorEstado('completada');
+        return $this->grupos()->whereNotNull('entrega_grupo.calificacion');
     }
 
     /**
-     * Obtener grupos con entrega en progreso
+     * Obtener grupos sin calificar
      */
-    public function gruposEnProgreso()
+    public function gruposSinCalificar()
     {
-        return $this->gruposPorEstado('en_progreso');
+        return $this->grupos()->whereNull('entrega_grupo.calificacion');
     }
 
     /**
-     * Obtener grupos con entrega retrasada
+     * Verificar si la entrega está vencida
      */
-    public function gruposRetrasados()
+    public function getEsVencidaAttribute()
     {
-        return $this->gruposPorEstado('retrasada');
+        return $this->fecha_limite && $this->fecha_limite < now();
     }
 
     /**
-     * Asignar entrega a un grupo con datos adicionales
+     * Calcular el porcentaje de progreso basado en entregas recibidas
      */
-    public function asignarAGrupo($grupoId, $fecha = null, $estado = 'pendiente', $observaciones = null)
+    public function getPorcentajeProgresoAttribute()
     {
-        return $this->grupos()->attach($grupoId, [
-            'fecha' => $fecha,
-            'estado' => $estado,
-            'observaciones' => $observaciones,
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
+        $total = $this->grupos->count();
+        if ($total === 0) return 0;
+        
+        $entregadas = $this->gruposEntregados()->count();
+        return round(($entregadas / $total) * 100, 2);
     }
-
-    /**
-     * Actualizar estado de entrega para un grupo específico
-     */
-    public function actualizarEstadoGrupo($grupoId, $estado, $observaciones = null)
-    {
-        return $this->grupos()->updateExistingPivot($grupoId, [
-            'estado' => $estado,
-            'observaciones' => $observaciones,
-            'updated_at' => now()
-        ]);
-    }
-    public $timestamps = false;
-    protected $primaryKey = 'id';
 }

@@ -35,6 +35,12 @@ class GrupoController extends Controller
         return redirect()->route('grupos.index')->with('success', 'Grupo '.$grupo->nombre.' creado exitosamente.');
     }
 
+    public function show($id)
+    {
+        $grupo = Grupo::with(['alumnos', 'entregas'])->findOrFail($id);
+        return view('grupos.show', compact('grupo'));
+    }
+
     public function edit($id)
     {   
         $grupo= Grupo::findOrFail($id); // Obtener el grupo por ID

@@ -10,7 +10,7 @@ class Grupo extends Model
     protected $table = 'grupos';
     protected $primaryKey = 'id';
 
-    public $timestamps = false;
+    public $timestamps = true;
 
     /**
      * The attributes that should be cast to native types.
@@ -52,47 +52,39 @@ class Grupo extends Model
     public function entregas()
     {
         return $this->belongsToMany(Entrega::class, 'entrega_grupo')
-                    ->withPivot(['fecha', 'estado', 'observaciones'])
+                    ->withPivot(['fecha_entrega', 'calificacion', 'comentarios', 'fecha_calificacion'])
                     ->withTimestamps();
     }
 
     /**
-     * Obtener entregas por estado
-     */
-    public function entregasPorEstado($estado)
-    {
-        return $this->entregas()->wherePivot('estado', $estado);
-    }
-
-    /**
-     * Obtener entregas pendientes
-     */
-    public function entregasPendientes()
-    {
-        return $this->entregasPorEstado('pendiente');
-    }
-
-    /**
-     * Obtener entregas completadas
+     * Obtener entregas completadas (que tienen fecha_entrega)
      */
     public function entregasCompletadas()
     {
-        return $this->entregasPorEstado('completada');
+        return $this->entregas()->whereNotNull('entrega_grupo.fecha_entrega');
     }
 
     /**
-     * Obtener entregas en progreso
+     * Obtener entregas pendientes (que no tienen fecha_entrega)
      */
-    public function entregasEnProgreso()
+    public function entregasPendientes()
     {
-        return $this->entregasPorEstado('en_progreso');
+        return $this->entregas()->whereNull('entrega_grupo.fecha_entrega');
     }
 
     /**
-     * Obtener entregas retrasadas
+     * Obtener entregas calificadas
      */
-    public function entregasRetrasadas()
+    public function entregasCalificadas()
     {
-        return $this->entregasPorEstado('retrasada');
+        return $this->entregas()->whereNotNull('entrega_grupo.calificacion');
+    }
+
+    /**
+     * Obtener entregas sin calificar
+     */
+    public function entregasSinCalificar()
+    {
+        return $this->entregas()->whereNull('entrega_grupo.calificacion');
     }
 }
