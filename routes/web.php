@@ -6,6 +6,7 @@ use App\Http\Controllers\GrupoController;
 use App\Http\Controllers\NotaController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EntregaController;
+use App\Http\Controllers\ProfileController;
 
 // Rutas de autenticación
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login')->middleware('guest');
@@ -25,6 +26,12 @@ Route::get('/sesion', function(){
 
 // Rutas protegidas por autenticación
 Route::middleware('auth')->group(function () {
+    // Rutas de perfil de usuario
+    Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
+    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile/picture', [ProfileController::class, 'deleteProfilePicture'])->name('profile.delete-picture');
+
     Route::get('/alumnos', [AlumnoController::class, 'index'])->name('alumnos.index');
     Route::get('/alumnos/create', [AlumnoController::class, 'create'])->name('alumnos.create');
     Route::post('/alumnos', [AlumnoController::class, 'store'])->name('alumnos.store');

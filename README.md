@@ -1,61 +1,190 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Sistema de Gestión de Alumnos
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Descripción del Proyecto
 
-## About Laravel
+Sistema web desarrollado para la gestión integral de alumnos, notas, entregas y grupos académicos. La aplicación permite administrar estudiantes, registrar calificaciones, gestionar entregas de trabajos y organizar grupos de estudio de manera eficiente.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Tecnologías Utilizadas
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### Backend
+- **PHP 8.2+** - Lenguaje de programación principal
+- **Laravel 12.x** - Framework PHP para desarrollo web
+- **MariaDB** - Base de datos relacional (con XAMPP)
+- **Maatwebsite/Excel** - Importación y exportación de archivos Excel
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Frontend
+- **Blade Templates** - Motor de plantillas de Laravel
+- **Bootstrap 5.3.0** - Framework CSS para estilos y componentes
+- **Vite** - Bundler de módulos y herramienta de desarrollo
+- **Font Awesome 6.4.0** - Librería de iconos
+- **JavaScript/Axios** - Para peticiones AJAX
 
-## Learning Laravel
+### Herramientas de Desarrollo
+- **Composer** - Gestor de dependencias PHP
+- **NPM** - Gestor de paquetes JavaScript
+- **PHPUnit** - Framework de testing para PHP
+- **Laravel Pint** - Linter de código PHP
+- **XAMPP** - Entorno de desarrollo local con Apache, MariaDB y PHP
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Funcionalidades Principales
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+- **Gestión de Alumnos**: Registro, edición y eliminación de estudiantes
+- **Gestión de Grupos**: Organización de alumnos por grupos académicos
+- **Sistema de Notas**: Registro y seguimiento de calificaciones
+- **Gestión de Entregas**: Control de trabajos y asignaciones
+- **Conceptos Académicos**: Manejo de diferentes tipos de evaluaciones
+- **Importación Excel**: Carga masiva de datos desde archivos Excel
+- **Autenticación**: Sistema de login y registro de usuarios
+- **Perfiles de Usuario**: Gestión de información personal
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Metodologías y Patrones Aplicados
 
-## Laravel Sponsors
+### Arquitectura
+- **MVC (Model-View-Controller)** - Patrón arquitectónico principal
+- **Eloquent ORM** - Mapeo objeto-relacional para base de datos
+- **Service Classes** - Lógica de negocio encapsulada en servicios
+- **Form Requests** - Validación de datos de entrada
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### Principios de Desarrollo
+- **SOLID** - Principios de diseño orientado a objetos
+- **DRY (Don't Repeat Yourself)** - Evitar duplicación de código
+- **Convention over Configuration** - Convenciones de Laravel
+- **RESTful Routes** - Rutas siguiendo convenciones REST
 
-### Premium Partners
+## Instalación y Configuración
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### Prerrequisitos
+- PHP 8.2 o superior
+- Composer
+- Node.js y NPM
+- XAMPP (Apache + MariaDB + PHP)
+- Git
 
-## Contributing
+### Pasos de Instalación
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+1. **Clonar el repositorio**
+   ```powershell
+   git clone https://github.com/maxramirez473/alumnos-app.git
+   cd alumnos-app
+   ```
 
-## Code of Conduct
+2. **Instalar dependencias de PHP**
+   ```powershell
+   composer install
+   ```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+3. **Instalar dependencias de JavaScript**
+   ```powershell
+   npm install
+   ```
 
-## Security Vulnerabilities
+4. **Configurar variables de entorno**
+   ```powershell
+   copy .env.example .env
+   ```
+   
+   Editar el archivo `.env` con la configuración de tu base de datos MariaDB:
+   ```env
+   DB_CONNECTION=mysql
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=alumnos_app
+   DB_USERNAME=root
+   DB_PASSWORD=
+   ```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+5. **Generar clave de aplicación**
+   ```powershell
+   php artisan key:generate
+   ```
 
-## License
+6. **Ejecutar migraciones**
+   ```powershell
+   php artisan migrate
+   ```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+7. **Ejecutar seeders (opcional)**
+   ```powershell
+   php artisan db:seed
+   ```
+
+8. **Crear enlace simbólico para storage**
+   ```powershell
+   php artisan storage:link
+   ```
+
+## Ejecutar la Aplicación
+
+### Entorno de Desarrollo
+
+1. **Iniciar servidor de Laravel**
+   ```powershell
+   php artisan serve
+   ```
+
+2. **Compilar assets (en otra terminal)**
+   ```powershell
+   npm run dev
+   ```
+
+La aplicación estará disponible en `http://localhost:8000`
+
+### Entorno de Producción
+
+1. **Compilar assets para producción**
+   ```powershell
+   npm run build
+   ```
+
+2. **Optimizar aplicación**
+   ```powershell
+   php artisan config:cache
+   php artisan route:cache
+   php artisan view:cache
+   ```
+
+## Estructura del Proyecto
+
+```
+app/
+├── Http/Controllers/     # Controladores
+├── Models/              # Modelos Eloquent
+├── Imports/             # Clases de importación Excel
+└── Services/            # Lógica de negocio
+
+resources/
+├── views/               # Plantillas Blade
+├── css/                 # Estilos CSS
+└── js/                  # JavaScript
+
+database/
+├── migrations/          # Migraciones de BD
+└── seeders/            # Datos de prueba
+
+routes/
+└── web.php             # Rutas web
+```
+
+## Testing
+
+Ejecutar las pruebas unitarias:
+```powershell
+php artisan test
+```
+
+## Contribución
+
+1. Fork el proyecto
+2. Crear una rama para tu feature (`git checkout -b feature/nueva-funcionalidad`)
+3. Commit tus cambios (`git commit -am 'Agregar nueva funcionalidad'`)
+4. Push a la rama (`git push origin feature/nueva-funcionalidad`)
+5. Crear un Pull Request
+
+## Licencia
+
+Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más detalles.
+
+## Contacto
+
+- **Repositorio**: https://github.com/maxramirez473/alumnos-app
+- **Autor**: maxramirez473

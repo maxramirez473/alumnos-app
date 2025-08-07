@@ -44,13 +44,27 @@
                     @else
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                                @if(Auth::user()->hasProfilePicture())
+                                    <img src="{{ Auth::user()->profile_picture_url }}" 
+                                         alt="Foto de perfil" 
+                                         class="rounded-circle me-1" 
+                                         style="width: 30px; height: 30px; object-fit: cover;">
+                                @endif
                                 {{ Auth::user()->name }}
                             </a>
                             <ul class="dropdown-menu">
                                 <li>
+                                    <a class="dropdown-item" href="{{ route('profile.show') }}">
+                                        <i class="fas fa-user me-2"></i>Mi Perfil
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
                                     <form action="{{ route('logout') }}" method="POST" class="d-inline">
                                         @csrf
-                                        <button type="submit" class="dropdown-item">Cerrar Sesión</button>
+                                        <button type="submit" class="dropdown-item">
+                                            <i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión
+                                        </button>
                                     </form>
                                 </li>
                             </ul>
