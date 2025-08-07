@@ -30,37 +30,46 @@ Route::middleware('auth')->group(function () {
     Route::post('/alumnos', [AlumnoController::class, 'store'])->name('alumnos.store');
     Route::get('/alumnos/{id}/edit', [AlumnoController::class, 'edit'])->name('alumnos.edit');
     Route::put('/alumno/edit', [AlumnoController::class, 'update'])->name('alumnos.update');
-    Route::delete('/alumnos/{id}', [AlumnoController::class, 'destroy'])->name('alumnos.destroy');
     Route::get('/alumnos/import', [AlumnoController::class, 'showImportForm'])->name('alumnos.import.form');
     Route::post('/alumnos/import', [AlumnoController::class, 'import'])->name('alumnos.import');
+    
+    // Ruta de eliminación de alumnos (solo admin)
+    Route::delete('/alumnos/{id}', [AlumnoController::class, 'destroy'])->name('alumnos.destroy')->middleware('admin');
 
     Route::get('/grupos', [GrupoController::class, 'index'])->name('grupos.index');
     Route::get('/grupos/create', [GrupoController::class, 'create'])->name('grupos.create');
     Route::post('/grupos', [GrupoController::class, 'store'])->name('grupos.store');
     Route::get('/grupos/{grupo}', [GrupoController::class, 'show'])->name('grupos.show');
-    Route::get('/grupos/{id}/edit', [GrupoController::class, 'edit'])->name('grupos.edit');
-    Route::put('/grupos/edit', [GrupoController::class, 'update'])->name('grupos.update');
-    Route::delete('/grupos/{id}', [GrupoController::class, 'destroy'])->name('grupos.destroy');
-
-    Route::get('/notas', [NotaController::class, 'index'])->name('notas.index');
-    Route::get('/notas/create', [NotaController::class, 'create'])->name('notas.create');
-    Route::post('/notas', [NotaController::class, 'store'])->name('notas.store');
-    Route::get('/notas/{id}/edit', [NotaController::class, 'edit'])->name('notas.edit');
-    Route::put('/notas/edit', [NotaController::class, 'update'])->name('notas.update');
-    Route::delete('/notas/{id}', [NotaController::class, 'destroy'])->name('notas.destroy');
-
-    // Rutas para entregas
-    Route::get('/entregas', [EntregaController::class, 'index'])->name('entregas.index');
-    Route::get('/entregas/create', [EntregaController::class, 'create'])->name('entregas.create');
-    Route::post('/entregas', [EntregaController::class, 'store'])->name('entregas.store');
-    Route::get('/entregas/{entrega}', [EntregaController::class, 'show'])->name('entregas.show');
-    Route::get('/entregas/{entrega}/edit', [EntregaController::class, 'edit'])->name('entregas.edit');
-    Route::put('/entregas/{entrega}', [EntregaController::class, 'update'])->name('entregas.update');
-    Route::delete('/entregas/{entrega}', [EntregaController::class, 'destroy'])->name('entregas.destroy');
     
-    // Rutas para gestión de entregas por grupo
-    Route::get('/entregas/{entrega}/grupos/{grupo}/editar', [EntregaController::class, 'editarEntregaGrupo'])->name('entregas.editar_grupo');
-    Route::put('/entregas/{entrega}/grupos/{grupo}', [EntregaController::class, 'actualizarEntregaGrupo'])->name('entregas.actualizar_grupo');
+    // Rutas de edición y eliminación de grupos (solo admin)
+    Route::get('/grupos/{id}/edit', [GrupoController::class, 'edit'])->name('grupos.edit')->middleware('admin');
+    Route::put('/grupos/edit', [GrupoController::class, 'update'])->name('grupos.update')->middleware('admin');
+    Route::delete('/grupos/{id}', [GrupoController::class, 'destroy'])->name('grupos.destroy')->middleware('admin');
+
+    // Todas las rutas de notas (solo admin)
+    Route::middleware('admin')->group(function () {
+        Route::get('/notas', [NotaController::class, 'index'])->name('notas.index');
+        Route::get('/notas/create', [NotaController::class, 'create'])->name('notas.create');
+        Route::post('/notas', [NotaController::class, 'store'])->name('notas.store');
+        Route::get('/notas/{id}/edit', [NotaController::class, 'edit'])->name('notas.edit');
+        Route::put('/notas/edit', [NotaController::class, 'update'])->name('notas.update');
+        Route::delete('/notas/{id}', [NotaController::class, 'destroy'])->name('notas.destroy');
+    });
+
+    // Todas las rutas de entregas (solo admin)
+    Route::middleware('admin')->group(function () {
+        Route::get('/entregas', [EntregaController::class, 'index'])->name('entregas.index');
+        Route::get('/entregas/create', [EntregaController::class, 'create'])->name('entregas.create');
+        Route::post('/entregas', [EntregaController::class, 'store'])->name('entregas.store');
+        Route::get('/entregas/{entrega}', [EntregaController::class, 'show'])->name('entregas.show');
+        Route::get('/entregas/{entrega}/edit', [EntregaController::class, 'edit'])->name('entregas.edit');
+        Route::put('/entregas/{entrega}', [EntregaController::class, 'update'])->name('entregas.update');
+        Route::delete('/entregas/{entrega}', [EntregaController::class, 'destroy'])->name('entregas.destroy');
+        
+        // Rutas para gestión de entregas por grupo
+        Route::get('/entregas/{entrega}/grupos/{grupo}/editar', [EntregaController::class, 'editarEntregaGrupo'])->name('entregas.editar_grupo');
+        Route::put('/entregas/{entrega}/grupos/{grupo}', [EntregaController::class, 'actualizarEntregaGrupo'])->name('entregas.actualizar_grupo');
+    });
 });
 
 

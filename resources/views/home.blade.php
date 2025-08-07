@@ -119,52 +119,6 @@
             </div>
         </div>
         
-        <!-- Acciones rápidas -->
-        <div class="row mt-4">
-            <div class="col-12">
-                <h4 class="mb-3">Acciones Rápidas</h4>
-            </div>
-            <div class="col-md-6 mb-3">
-                <div class="card bg-light">
-                    <div class="card-body">
-                        <h6 class="card-title"><i class="fas fa-plus text-primary me-2"></i>Crear Nuevo</h6>
-                        <div class="d-flex gap-2 flex-wrap">
-                            <a href="{{ route('alumnos.create') }}" class="btn btn-outline-primary btn-sm">
-                                <i class="fas fa-user-plus me-1"></i>Alumno
-                            </a>
-                            <a href="{{ route('grupos.create') }}" class="btn btn-outline-success btn-sm">
-                                <i class="fas fa-plus me-1"></i>Grupo
-                            </a>
-                            <a href="{{ route('notas.create') }}" class="btn btn-outline-warning btn-sm">
-                                <i class="fas fa-star me-1"></i>Nota
-                            </a>
-                            <a href="{{ route('entregas.create') }}" class="btn btn-outline-info btn-sm">
-                                <i class="fas fa-clipboard-check me-1"></i>Entrega
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 mb-3">
-                <div class="card bg-light">
-                    <div class="card-body">
-                        <h6 class="card-title"><i class="fas fa-tools text-secondary me-2"></i>Herramientas</h6>
-                        <div class="d-flex gap-2 flex-wrap">
-                            <a href="{{ route('alumnos.import.form') }}" class="btn btn-outline-secondary btn-sm">
-                                <i class="fas fa-file-import me-1"></i>Importar Alumnos
-                            </a>
-                            <a href="#" class="btn btn-outline-secondary btn-sm" onclick="exportAllData()">
-                                <i class="fas fa-download me-1"></i>Exportar Datos
-                            </a>
-                            <a href="#" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#statsModal">
-                                <i class="fas fa-chart-bar me-1"></i>Estadísticas
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
         <div class="row mt-4">
             <div class="col-12">
                 <div class="alert alert-info">

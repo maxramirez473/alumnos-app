@@ -34,6 +34,9 @@ class AuthController extends Controller
         if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
             
+            // Agregar el rol del usuario a la sesión
+            $request->session()->put('user_role', Auth::user()->rol);
+            
             return redirect()->intended(route('home'))->with('success', 'Bienvenido de vuelta!');
         }
 
@@ -65,9 +68,13 @@ class AuthController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'rol' => 'user', // Asignar rol por defecto
         ]);
 
         Auth::login($user);
+
+        // Agregar el rol del usuario a la sesión
+        $request->session()->put('user_role', $user->rol);
 
         return redirect(route('home'))->with('success', '¡Cuenta creada exitosamente!');
     }
