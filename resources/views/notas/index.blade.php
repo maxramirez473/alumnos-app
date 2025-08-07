@@ -6,7 +6,7 @@
         <div class="col-md-12">
             <!-- Encabezado -->
             <div class="d-flex align-items-center justify-content-between mb-4">
-                <div class="mx-auto">
+                <div class="d-flex align-items-center">
                     <div class="bg-warning rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
                         <i class="fas fa-star text-white"></i>
                     </div>
@@ -14,6 +14,11 @@
                         <h2 class="mb-0 text-dark fw-bold">Gestión de Notas</h2>
                         <p class="text-muted mb-0">Administra las calificaciones de los estudiantes</p>
                     </div>
+                </div>
+                <div>
+                    <a href="{{ route('notas.create') }}" class="btn btn-warning">
+                        <i class="fas fa-plus me-2"></i>Agregar Nueva Nota
+                    </a>
                 </div>
             </div>
 
@@ -247,10 +252,7 @@
                                 <i class="fas fa-star fa-4x text-muted"></i>
                             </div>
                             <h4 class="text-muted">No hay notas registradas</h4>
-                            <p class="text-muted mb-4">Comienza evaluando a los estudiantes del sistema</p>
-                            <a href="{{ route('notas.create') }}" class="btn btn-warning">
-                                <i class="fas fa-plus me-2"></i>Crear Primera Nota
-                            </a>
+                            <p class="text-muted mb-4">Comienza evaluando a los estudiantes del sistema usando el botón "Agregar Nueva Nota" en la parte superior</p>
                         </div>
                     @endif
                 </div>
