@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('Notas', function (Blueprint $table) {
+        Schema::table('notas', function (Blueprint $table) {
             $table->enum('estado', ['Activo', 'Inactivo'])
                 ->default('Activo');
         });

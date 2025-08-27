@@ -1,0 +1,63 @@
+# 4.1. Crear base de datos y usuario en MariaDB/MySQL
+# Ingresa a la consola de MariaDB:
+sudo mariadb
+
+# Dentro de la consola ejecuta:
+# (Cambia 'alumnos_app', 'usuario_app' y 'tu_contraseña' por los valores que desees)
+CREATE DATABASE alumnos_app CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER 'usuario_app'@'localhost' IDENTIFIED BY 'tu_contraseña';
+GRANT ALL PRIVILEGES ON alumnos_app.* TO 'usuario_app'@'localhost';
+FLUSH PRIVILEGES;
+EXIT;
+
+# 4.2. Configura el archivo .env de Laravel con estos datos:
+# DB_CONNECTION=mysql
+# DB_HOST=127.0.0.1
+# DB_PORT=3306
+# DB_DATABASE=alumnos_app
+# DB_USERNAME=usuario_app
+# DB_PASSWORD=tu_contraseña
+############################################################
+# Guía de instalación para Laravel 12 en Debian 12
+############################################################
+
+# 1. Actualizar el sistema
+sudo apt update && sudo apt upgrade -y
+
+# 2. Instalar Git
+sudo apt install git -y
+
+# 3. Instalar Apache (opcional, puedes usar nginx)
+sudo apt install apache2 -y
+
+# 4. Instalar MariaDB (puedes usar mysql-server si prefieres)
+sudo apt install mariadb-server -y
+
+# 5. Instalar PHP y extensiones necesarias
+sudo apt install php8.2 php8.2-cli php8.2-fpm php8.2-mysql php8.2-xml php8.2-mbstring php8.2-curl php8.2-zip php8.2-gd php8.2-intl php8.2-bcmath php8.2-fileinfo php8.2-readline php8.2-tokenizer php8.2-simplexml php8.2-xsl -y
+
+# 6. Instalar Composer
+sudo apt install composer -y
+
+# 7. Instalar Node.js y npm (para compilar assets)
+sudo apt install nodejs npm -y
+
+# 8. Dar permisos a carpetas necesarias de Laravel
+sudo chown -R www-data:www-data storage bootstrap/cache
+sudo chmod -R 775 storage bootstrap/cache
+
+# 9. Instalar dependencias del proyecto
+composer install
+
+# 10. Compilar assets (si usas Vite o Laravel Mix)
+npm install
+npm run build
+
+# 11. Configurar base de datos y .env
+# Edita el archivo .env con tus credenciales de MariaDB
+
+# 12. Migrar la base de datos
+php artisan migrate --seed
+
+# 13. Opcional: configurar virtual host en Apache
+# Ver documentación oficial de Laravel para detalles

@@ -1,0 +1,47 @@
+############################################################
+# Despliegue de Laravel 12 con Apache 2 en Debian 12
+############################################################
+
+# 1. Crear archivo de configuración del sitio
+sudo nano /etc/apache2/sites-available/alumnos-app.conf
+
+# Contenido recomendado:
+<VirtualHost *:80>
+	ServerName alumnos-app.local
+	DocumentRoot /home/totopc/Escritorio/alumnos-app/public
+
+	<Directory /home/totopc/Escritorio/alumnos-app/public>
+		AllowOverride All
+		Require all granted
+	</Directory>
+
+	ErrorLog ${APACHE_LOG_DIR}/alumnos-app_error.log
+	CustomLog ${APACHE_LOG_DIR}/alumnos-app_access.log combined
+</VirtualHost>
+
+# 2. Habilitar el sitio y el módulo rewrite
+sudo a2ensite alumnos-app.conf
+sudo a2enmod rewrite
+sudo systemctl reload apache2
+
+# 3. Agregar el dominio local al archivo hosts
+echo "127.0.0.1 alumnos-app.local" | sudo tee -a /etc/hosts
+
+# 4. Dar permisos a carpetas necesarias
+sudo chown -R www-data:www-data /home/totopc/Escritorio/alumnos-app/storage /home/totopc/Escritorio/alumnos-app/bootstrap/cache /home/totopc/Escritorio/alumnos-app/public
+sudo chmod -R 775 /home/totopc/Escritorio/alumnos-app/storage /home/totopc/Escritorio/alumnos-app/bootstrap/cache
+sudo chmod -R 755 /home/totopc/Escritorio/alumnos-app/public
+sudo chmod +x /home/totopc
+sudo chmod +x /home/totopc/Escritorio
+
+# 5. Verificar archivo .htaccess en public/
+# Debe tener el contenido estándar de Laravel para redirección y acceso.
+
+# 6. Reiniciar Apache
+sudo systemctl restart apache2
+
+# 7. Acceder a la aplicación
+# Ir a http://alumnos-app.local en el navegador
+
+# 8. Si hay errores, revisar el log de Apache
+sudo tail -n 20 /var/log/apache2/error.log
