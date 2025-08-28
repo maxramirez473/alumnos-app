@@ -14,20 +14,23 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        // Crear usuario administrador de prueba
-        User::create([
+        User::firstOrCreate(
+        ['email' => 'admin@alumnos.app'],
+        [
             'name' => 'Administrador',
-            'email' => 'admin@alumnos.app',
             'rol' => 'admin',
             'password' => Hash::make('password123'),
-        ]);
+        ]
+);
 
         // Crear usuario regular de prueba
-        User::create([
+        User::firstOrCreate(
+        ['email' => 'usuario@alumnos.app'],
+        [
             'name' => 'Usuario de Prueba',
-            'email' => 'usuario@alumnos.app',
             'rol' => 'user',
             'password' => Hash::make('password123'),
-        ]);
+        ]
+        );
     }
 }
