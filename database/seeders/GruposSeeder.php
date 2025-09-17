@@ -15,16 +15,16 @@ class GruposSeeder extends Seeder
     {
         DB::table('grupos')->insert([
             ['numero'=>1,'nombre' => 'Vocación +'],
-            ['numero'=>2,'nombre' => 'Corral de Engorde'],
+            ['numero'=>2,'nombre' => 'LotManager'],
             ['numero'=>3,'nombre' => 'BibliOS'],
             ['numero'=>4,'nombre' => 'Manuel Belgrano 2.0'],
             ['numero'=>5,'nombre' => 'Let Me Cook'],
             ['numero'=>6,'nombre' => 'TurnosYA'],
             ['numero'=>7,'nombre' => 'Hospedaje'],
-            ['numero'=>8,'nombre' => 'Bolsa de Trabajo'],
+            ['numero'=>8,'nombre' => 'Bagmmerce'],
             ['numero'=>9,'nombre' => 'DSMB'],
             ['numero'=>10,'nombre' => 'Memoriae'],
-            ['numero'=>11,'nombre' => 'InfraUTN'],
+            ['numero'=>11,'nombre' => 'SIRMU'],
         ]);
     }
 }
