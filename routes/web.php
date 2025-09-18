@@ -1,4 +1,5 @@
 
+
 <?php
 
 use Illuminate\Support\Facades\Route;
@@ -29,6 +30,9 @@ Route::get('/sesion', function(){
 Route::middleware('auth')->group(function () {
     // Ruta para simulador de SQL Injection
     Route::match(['get', 'post'], 'alumnos/injectionSimulator', [App\Http\Controllers\AlumnoController::class, 'injectionSimulator']);
+
+    // Ruta para simulador de XSS
+    Route::match(['get', 'post'], 'alumnos/xssSimulator', [App\Http\Controllers\AlumnoController::class, 'xssSimulator']);
 
     // Rutas de perfil de usuario
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');

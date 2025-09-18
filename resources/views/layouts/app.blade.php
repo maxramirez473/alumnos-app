@@ -34,6 +34,9 @@
                             <li class="nav-item">
                                 <a class="nav-link text-danger" href="{{ url('alumnos/injectionSimulator') }}">Simulador SQL Injection</a>
                             </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-warning" href="{{ url('alumnos/xssSimulator') }}">Simulador XSS</a>
+                                </li>
                     @endauth
                 </ul>
                 <ul class="navbar-nav">

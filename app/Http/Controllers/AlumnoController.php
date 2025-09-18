@@ -12,6 +12,15 @@ use App\Imports\AlumnosImport;
 
 class AlumnoController extends Controller
 {
+    // Simulador de XSS
+    public function xssSimulator(Request $request)
+    {
+        $comentario = '';
+        if ($request->isMethod('post')) {
+            $comentario = $request->input('comentario');
+        }
+        return view('alumnos.xssSimulator', compact('comentario'));
+    }
     // Simulador de SQL Injection
     public function injectionSimulator(Request $request)
     {
