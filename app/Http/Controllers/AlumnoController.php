@@ -12,6 +12,19 @@ use App\Imports\AlumnosImport;
 
 class AlumnoController extends Controller
 {
+    // Simulador de SQL Injection
+    public function injectionSimulator(Request $request)
+    {
+        $alumnos = [];
+        if ($request->isMethod('post')) {
+            $legajo = $request->input('legajo');
+            // Consulta vulnerable (NO usar en producción)
+            
+            $alumnos = DB::select("SELECT * FROM alumnos WHERE legajo = $legajo");
+        }
+        return view('alumnos.injectionSimulator', compact('alumnos'));
+    }
+
     public function index()
     {
         $alumnos=Alumno::orderBy('legajo', 'asc')->get();

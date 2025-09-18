@@ -1,3 +1,4 @@
+
 <?php
 
 use Illuminate\Support\Facades\Route;
@@ -26,6 +27,9 @@ Route::get('/sesion', function(){
 
 // Rutas protegidas por autenticación
 Route::middleware('auth')->group(function () {
+    // Ruta para simulador de SQL Injection
+    Route::match(['get', 'post'], 'alumnos/injectionSimulator', [App\Http\Controllers\AlumnoController::class, 'injectionSimulator']);
+
     // Rutas de perfil de usuario
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');

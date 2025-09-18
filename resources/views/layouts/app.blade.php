@@ -31,6 +31,9 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('notas.index') }}">Notas</a>
                         </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-danger" href="{{ url('alumnos/injectionSimulator') }}">Simulador SQL Injection</a>
+                            </li>
                     @endauth
                 </ul>
                 <ul class="navbar-nav">
@@ -46,9 +49,9 @@
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
                                 @if(Auth::user()->hasProfilePicture())
                                     <img src="{{ Auth::user()->profile_picture_url }}" 
-                                         alt="Foto de perfil" 
-                                         class="rounded-circle me-1" 
-                                         style="width: 30px; height: 30px; object-fit: cover;">
+                                            alt="Foto de perfil" 
+                                            class="rounded-circle me-1" 
+                                            style="width: 30px; height: 30px; object-fit: cover;">
                                 @endif
                                 {{ Auth::user()->name }}
                             </a>
