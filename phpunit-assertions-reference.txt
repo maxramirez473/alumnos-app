@@ -1,0 +1,402 @@
+================================================================================
+                    REFERENCIA DE ASERCIONES PHPUNIT 11.x
+================================================================================
+Fecha: 30 de septiembre de 2025
+Proyecto: alumnos-app
+Versión PHPUnit: 11.5.25
+
+Esta referencia contiene los métodos de aserción más comunes disponibles en 
+PHPUnit 11.x para escribir pruebas unitarias efectivas.
+
+================================================================================
+                            ASERCIONES BÁSICAS
+================================================================================
+
+assertTrue($condition, $message = '')
+assertFalse($condition, $message = '')
+    - Verifica que una condición sea verdadera o falsa
+    - Ejemplo: $this->assertTrue($user->isActive());
+
+assertNull($actual, $message = '')
+assertNotNull($actual, $message = '')
+    - Verifica valores nulos
+    - Ejemplo: $this->assertNotNull($user->getId());
+
+assertEquals($expected, $actual, $message = '')
+assertNotEquals($expected, $actual, $message = '')
+    - Compara valores con == (igualdad suave)
+    - Ejemplo: $this->assertEquals(5, $user->getAge());
+
+assertSame($expected, $actual, $message = '')
+assertNotSame($expected, $actual, $message = '')
+    - Compara valores con === (igualdad estricta)
+    - Ejemplo: $this->assertSame('active', $user->getStatus());
+
+================================================================================
+                         ASERCIONES DE TIPOS DE DATOS
+================================================================================
+
+assertIsArray($actual, $message = '')
+assertIsNotArray($actual, $message = '')
+    - Verifica si es un array
+    - Ejemplo: $this->assertIsArray($users);
+
+assertIsBool($actual, $message = '')
+assertIsNotBool($actual, $message = '')
+    - Verifica si es booleano
+    - Ejemplo: $this->assertIsBool($user->isActive());
+
+assertIsFloat($actual, $message = '')
+assertIsNotFloat($actual, $message = '')
+    - Verifica si es número decimal
+    - Ejemplo: $this->assertIsFloat($product->getPrice());
+
+assertIsInt($actual, $message = '')
+assertIsNotInt($actual, $message = '')
+    - Verifica si es número entero
+    - Ejemplo: $this->assertIsInt($user->getAge());
+
+assertIsNumeric($actual, $message = '')
+assertIsNotNumeric($actual, $message = '')
+    - Verifica si es numérico (int, float, o string numérico)
+    - Ejemplo: $this->assertIsNumeric($input);
+
+assertIsObject($actual, $message = '')
+assertIsNotObject($actual, $message = '')
+    - Verifica si es un objeto
+    - Ejemplo: $this->assertIsObject($user);
+
+assertIsResource($actual, $message = '')
+assertIsNotResource($actual, $message = '')
+    - Verifica si es un recurso (file handle, etc.)
+
+assertIsScalar($actual, $message = '')
+assertIsNotScalar($actual, $message = '')
+    - Verifica si es escalar (int, float, string, bool)
+
+assertIsString($actual, $message = '')
+assertIsNotString($actual, $message = '')
+    - Verifica si es string
+    - Ejemplo: $this->assertIsString($user->getName());
+
+assertIsCallable($actual, $message = '')
+assertIsNotCallable($actual, $message = '')
+    - Verifica si es callable (función, método)
+
+assertIsIterable($actual, $message = '')
+assertIsNotIterable($actual, $message = '')
+    - Verifica si es iterable (array o implementa Traversable)
+
+================================================================================
+                            ASERCIONES DE ARRAYS
+================================================================================
+
+assertArrayHasKey($key, $array, $message = '')
+assertArrayNotHasKey($key, $array, $message = '')
+    - Verifica si un array tiene una clave específica
+    - Ejemplo: $this->assertArrayHasKey('nombre', $grupo);
+
+assertArraySubset($subset, $array, $message = '') [DEPRECATED]
+    - Usar assertArrayContains() o verificaciones manuales
+
+assertContains($needle, $haystack, $message = '')
+assertNotContains($needle, $haystack, $message = '')
+    - Verifica si un valor está contenido en un array
+    - Ejemplo: $this->assertContains('admin', $user->getRoles());
+
+assertContainsOnly($type, $haystack, $message = '')
+assertNotContainsOnly($type, $haystack, $message = '')
+    - Verifica que todos los elementos sean del mismo tipo
+    - Ejemplo: $this->assertContainsOnly('string', $names);
+
+assertContainsOnlyInstancesOf($classname, $haystack, $message = '')
+    - Verifica que todos los elementos sean instancias de una clase
+    - Ejemplo: $this->assertContainsOnlyInstancesOf(User::class, $users);
+
+assertCount($expectedCount, $haystack, $message = '')
+assertNotCount($expectedCount, $haystack, $message = '')
+    - Verifica el número de elementos
+    - Ejemplo: $this->assertCount(5, $users);
+
+assertEmpty($actual, $message = '')
+assertNotEmpty($actual, $message = '')
+    - Verifica si está vacío
+    - Ejemplo: $this->assertNotEmpty($user->getName());
+
+================================================================================
+                           ASERCIONES DE STRINGS
+================================================================================
+
+assertStringContainsString($needle, $haystack, $message = '')
+assertStringNotContainsString($needle, $haystack, $message = '')
+    - Verifica si un string contiene otro
+    - Ejemplo: $this->assertStringContainsString('@', $email);
+
+assertStringContainsStringIgnoringCase($needle, $haystack, $message = '')
+assertStringNotContainsStringIgnoringCase($needle, $haystack, $message = '')
+    - Igual que el anterior pero sin distinción de mayúsculas/minúsculas
+
+assertStringStartsWith($prefix, $string, $message = '')
+assertStringNotStartsWith($prefix, $string, $message = '')
+    - Verifica el inicio de un string
+    - Ejemplo: $this->assertStringStartsWith('https://', $url);
+
+assertStringEndsWith($suffix, $string, $message = '')
+assertStringNotEndsWith($suffix, $string, $message = '')
+    - Verifica el final de un string
+    - Ejemplo: $this->assertStringEndsWith('.com', $email);
+
+assertMatchesRegularExpression($pattern, $string, $message = '')
+assertDoesNotMatchRegularExpression($pattern, $string, $message = '')
+    - Verifica patrones con expresiones regulares
+    - Ejemplo: $this->assertMatchesRegularExpression('/^\d+$/', $legajo);
+
+assertStringMatchesFormat($format, $string, $message = '')
+assertStringNotMatchesFormat($format, $string, $message = '')
+    - Verifica formato usando placeholders
+    - Ejemplo: $this->assertStringMatchesFormat('%d-%d-%d', $date);
+
+================================================================================
+                          ASERCIONES NUMÉRICAS
+================================================================================
+
+assertGreaterThan($expected, $actual, $message = '')
+assertGreaterThanOrEqual($expected, $actual, $message = '')
+assertLessThan($expected, $actual, $message = '')
+assertLessThanOrEqual($expected, $actual, $message = '')
+    - Comparaciones numéricas
+    - Ejemplo: $this->assertGreaterThan(0, $user->getAge());
+
+assertEqualsWithDelta($expected, $actual, $delta, $message = '')
+assertNotEqualsWithDelta($expected, $actual, $delta, $message = '')
+    - Comparación con margen de error (útil para floats)
+    - Ejemplo: $this->assertEqualsWithDelta(3.14, $pi, 0.01);
+
+assertInfinite($actual, $message = '')
+assertFinite($actual, $message = '')
+assertNan($actual, $message = '')
+    - Verificaciones especiales para números
+
+================================================================================
+                         ASERCIONES DE INSTANCIAS
+================================================================================
+
+assertInstanceOf($expected, $actual, $message = '')
+assertNotInstanceOf($expected, $actual, $message = '')
+    - Verifica el tipo de clase/interfaz
+    - Ejemplo: $this->assertInstanceOf(User::class, $user);
+
+assertObjectHasProperty($propertyName, $object, $message = '')
+assertObjectNotHasProperty($propertyName, $object, $message = '')
+    - Verifica propiedades de objetos (públicas, protegidas, privadas)
+    - Ejemplo: $this->assertObjectHasProperty('name', $user);
+
+================================================================================
+                         ASERCIONES DE ARCHIVOS
+================================================================================
+
+assertFileExists($filename, $message = '')
+assertFileNotExists($filename, $message = '')
+    - Verifica existencia de archivos
+    - Ejemplo: $this->assertFileExists('/path/to/config.php');
+
+assertFileIsReadable($filename, $message = '')
+assertFileIsNotReadable($filename, $message = '')
+assertFileIsWritable($filename, $message = '')
+assertFileIsNotWritable($filename, $message = '')
+    - Verifica permisos de archivos
+
+assertDirectoryExists($directory, $message = '')
+assertDirectoryNotExists($directory, $message = '')
+assertDirectoryIsReadable($directory, $message = '')
+assertDirectoryIsNotReadable($directory, $message = '')
+assertDirectoryIsWritable($directory, $message = '')
+assertDirectoryIsNotWritable($directory, $message = '')
+    - Verificaciones para directorios
+
+assertFileEquals($expected, $actual, $message = '')
+assertFileNotEquals($expected, $actual, $message = '')
+    - Compara contenido de archivos
+
+================================================================================
+                            ASERCIONES DE JSON
+================================================================================
+
+assertJson($actualJson, $message = '')
+    - Verifica que sea JSON válido
+    - Ejemplo: $this->assertJson($response->getContent());
+
+assertJsonStringEqualsJsonString($expectedJson, $actualJson, $message = '')
+assertJsonStringNotEqualsJsonString($expectedJson, $actualJson, $message = '')
+    - Compara strings JSON
+
+assertJsonStringEqualsJsonFile($expectedFile, $actualJson, $message = '')
+assertJsonStringNotEqualsJsonFile($expectedFile, $actualJson, $message = '')
+    - Compara JSON string con archivo JSON
+
+assertJsonFileEqualsJsonFile($expectedFile, $actualFile, $message = '')
+assertJsonFileNotEqualsJsonFile($expectedFile, $actualFile, $message = '')
+    - Compara dos archivos JSON
+
+================================================================================
+                           ASERCIONES DE XML
+================================================================================
+
+assertXmlFileEqualsXmlFile($expectedFile, $actualFile, $message = '')
+assertXmlFileNotEqualsXmlFile($expectedFile, $actualFile, $message = '')
+    - Compara archivos XML
+
+assertXmlStringEqualsXmlFile($expectedFile, $actualXml, $message = '')
+assertXmlStringNotEqualsXmlFile($expectedFile, $actualXml, $message = '')
+    - Compara string XML con archivo
+
+assertXmlStringEqualsXmlString($expectedXml, $actualXml, $message = '')
+assertXmlStringNotEqualsXmlString($expectedXml, $actualXml, $message = '')
+    - Compara strings XML
+
+================================================================================
+                          ASERCIONES PERSONALIZADAS
+================================================================================
+
+assertThat($value, $constraint, $message = '')
+    - Permite usar constraints personalizados
+    - Ejemplo: $this->assertThat($value, $this->logicalAnd(
+                   $this->greaterThan(1),
+                   $this->lessThan(10)
+               ));
+
+================================================================================
+                             MÉTODOS DE FALLO
+================================================================================
+
+fail($message = '')
+    - Falla inmediatamente el test
+    - Ejemplo: $this->fail('Este código no debería ejecutarse');
+
+markTestIncomplete($message = '')
+    - Marca el test como incompleto
+    - Ejemplo: $this->markTestIncomplete('Pendiente implementar validación');
+
+markTestSkipped($message = '')
+    - Omite el test
+    - Ejemplo: $this->markTestSkipped('Requiere extensión MySQL');
+
+================================================================================
+                         ASERCIONES PARA LARAVEL
+================================================================================
+
+Si usas Tests\TestCase (Laravel) en lugar de PHPUnit\Framework\TestCase:
+
+assertDatabaseHas($table, array $data, $connection = null)
+assertDatabaseMissing($table, array $data, $connection = null)
+assertDatabaseCount($table, int $count, $connection = null)
+    - Verificaciones de base de datos
+
+assertStatus($status)
+assertJson(array $data, $strict = false)
+assertJsonStructure(array $structure = null, $data = null)
+assertJsonFragment(array $data)
+assertJsonMissing(array $data)
+    - Para respuestas HTTP/API
+
+assertSee($value, $escape = true)
+assertDontSee($value, $escape = true)
+assertSeeText($value)
+assertDontSeeText($value)
+    - Para contenido de vistas
+
+================================================================================
+                              BUENAS PRÁCTICAS
+================================================================================
+
+1. Siempre incluir mensajes descriptivos en las aserciones:
+   ✅ $this->assertEquals(200, $response->status(), 'La API debe retornar 200');
+   ❌ $this->assertEquals(200, $response->status());
+
+2. Usar aserciones específicas cuando sea posible:
+   ✅ $this->assertIsInt($age);
+   ❌ $this->assertTrue(is_int($age));
+
+3. Agrupar aserciones relacionadas en el mismo test:
+   ✅ Un test para validar estructura de usuario completa
+   ❌ Tests separados para cada campo del usuario
+
+4. Usar data providers para múltiples casos de prueba:
+   /**
+    * @dataProvider validEmailProvider
+    */
+   public function testValidEmail($email) {
+       $this->assertTrue($validator->isValidEmail($email));
+   }
+
+5. Nombres descriptivos para los tests:
+   ✅ test_user_can_update_profile_with_valid_data()
+   ❌ test_update()
+
+================================================================================
+                              EJEMPLOS PRÁCTICOS
+================================================================================
+
+// Test de modelo Alumno
+public function test_alumno_model_validation() {
+    $alumno = [
+        'legajo' => 12345,
+        'nombre' => 'Juan Pérez',
+        'email' => 'juan@example.com',
+        'grupo_id' => 1
+    ];
+    
+    $this->assertIsArray($alumno);
+    $this->assertArrayHasKey('legajo', $alumno);
+    $this->assertIsInt($alumno['legajo']);
+    $this->assertGreaterThan(0, $alumno['legajo']);
+    $this->assertIsString($alumno['nombre']);
+    $this->assertStringContainsString('@', $alumno['email']);
+    $this->assertMatchesRegularExpression('/^[^@]+@[^@]+\.[^@]+$/', $alumno['email']);
+}
+
+// Test de respuesta API
+public function test_api_response_structure() {
+    $response = $this->getJson('/api/alumnos');
+    
+    $response->assertStatus(200)
+             ->assertJsonStructure([
+                 'data' => [
+                     '*' => ['id', 'legajo', 'nombre', 'email']
+                 ],
+                 'meta' => ['total']
+             ]);
+    
+    $data = $response->json();
+    $this->assertIsArray($data['data']);
+    $this->assertIsInt($data['meta']['total']);
+    $this->assertGreaterThanOrEqual(0, $data['meta']['total']);
+}
+
+// Test de validaciones
+public function test_validation_rules() {
+    $validator = new AlumnoValidator();
+    
+    // Datos válidos
+    $validData = ['legajo' => 123, 'nombre' => 'Test'];
+    $this->assertTrue($validator->validate($validData));
+    
+    // Datos inválidos
+    $invalidData = ['legajo' => null, 'nombre' => ''];
+    $this->assertFalse($validator->validate($invalidData));
+    
+    $errors = $validator->getErrors();
+    $this->assertNotEmpty($errors);
+    $this->assertArrayHasKey('legajo', $errors);
+    $this->assertContains('requerido', $errors['legajo'][0]);
+}
+
+================================================================================
+                                    FIN
+================================================================================
+
+Para más información consulta la documentación oficial de PHPUnit:
+https://phpunit.de/documentation.html
+
+Versión del documento: 1.0
+Última actualización: 30 de septiembre de 2025
