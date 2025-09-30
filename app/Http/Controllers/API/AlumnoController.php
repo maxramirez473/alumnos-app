@@ -8,11 +8,28 @@ use App\Models\Alumno;
 
 class AlumnoController extends Controller
 {
-    // Listar todos los alumnos
-    public function index()
+    // Listar todos los alumnos (con búsqueda opcional)
+    public function index(Request $request)
     {
-        $alumnos = Alumno::orderBy('legajo', 'asc')->get();
-        return response()->json($alumnos);
+        $query = Alumno::query();
+        
+        // Si hay parámetro de búsqueda, filtrar
+        if ($request->has('search') && !empty($request->search)) {
+            $search = $request->search;
+            $query->where('nombre', 'LIKE', "%{$search}%")
+                  ->orWhere('email', 'LIKE', "%{$search}%")
+                  ->orWhere('legajo', 'LIKE', "%{$search}%");
+        }
+        
+        $alumnos = $query->orderBy('legajo', 'asc')->get();
+        
+        // Retornamos en formato que los tests esperan
+        return response()->json([
+            'data' => $alumnos,
+            'meta' => [
+                'total' => $alumnos->count()
+            ]
+        ]);
     }
 
     // Mostrar un alumno por ID
@@ -29,6 +46,7 @@ class AlumnoController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
+            'legajo' => 'required|integer|unique:alumnos,legajo',
             'nombre' => 'required|string|max:255',
             'email' => 'required|email|unique:alumnos,email',
             'grupo_id' => 'nullable|exists:grupos,id',
@@ -45,6 +63,7 @@ class AlumnoController extends Controller
             return response()->json(['error' => 'Alumno no encontrado'], 404);
         }
         $validated = $request->validate([
+            'legajo' => 'required|integer|unique:alumnos,legajo,' . $id,
             'nombre' => 'required|string|max:255',
             'email' => 'required|email|unique:alumnos,email,' . $id,
             'grupo_id' => 'nullable|exists:grupos,id',
@@ -61,6 +80,6 @@ class AlumnoController extends Controller
             return response()->json(['error' => 'Alumno no encontrado'], 404);
         }
         $alumno->delete();
-        return response()->json(['message' => 'Alumno eliminado correctamente']);
+        return response()->json(null, 204);
     }
 }

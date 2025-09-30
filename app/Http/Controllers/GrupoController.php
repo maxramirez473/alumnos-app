@@ -66,23 +66,33 @@ class GrupoController extends Controller
         return redirect()->route('grupos.index')->with('success', 'Grupo actualizado exitosamente.');
     }
 
-    public function destroy($id)
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
     {
-        $grupo = Grupo::findOrFail($id);
+        $grupo = Grupo::find($id);
         
-        // Verificar si el grupo tiene alumnos asignados
-        $alumnosCount = $grupo->alumnos()->count();
-        
-        if ($alumnosCount > 0) {
-            return redirect()->route('grupos.index')
-                ->with('error', "No se puede eliminar el grupo '{$grupo->nombre}' porque tiene {$alumnosCount} alumno(s) asignado(s). Primero reasigne o elimine los alumnos.");
+        if (!$grupo) {
+            return response()->json(['error' => 'Grupo no encontrado'], 404);
         }
         
-        // Si no hay alumnos, proceder con la eliminación
-        $nombreGrupo = $grupo->nombre;
         $grupo->delete();
+        return response()->json(null, 204);
+    }
+
+    /**
+     * Get all students from a specific group
+     */
+    public function alumnos(string $id)
+    {
+        $grupo = Grupo::find($id);
         
-        return redirect()->route('grupos.index')
-            ->with('success', "Grupo '{$nombreGrupo}' eliminado exitosamente.");
+        if (!$grupo) {
+            return response()->json(['error' => 'Grupo no encontrado'], 404);
+        }
+        
+        $alumnos = $grupo->alumnos;
+        return response()->json(['data' => $alumnos], 200);
     }
 }

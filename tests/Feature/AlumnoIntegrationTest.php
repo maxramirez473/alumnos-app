@@ -157,7 +157,7 @@ class AlumnoIntegrationTest extends TestCase
 
         // Act - Buscamos alumnos que contengan "Carlos"
         $response = $this->actingAs($this->user)
-                         ->getJson('/api/alumnos?search=Carlos');
+                        ->getJson('/api/alumnos?search=Carlos');
 
         // Assert
         $response->assertStatus(200);

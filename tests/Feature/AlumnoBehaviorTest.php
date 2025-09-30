@@ -54,13 +54,11 @@ class AlumnoBehaviorTest extends TestCase
 
         // PASO 2: Admin crea grupos para organizar alumnos
         $grupoA = $this->postJson('/api/grupos', [
-            'nombre' => 'Grupo A - Matemáticas',
-            'descripcion' => 'Grupo avanzado de matemáticas'
+            'nombre' => 'Grupo A',
         ])->assertStatus(201);
 
         $grupoB = $this->postJson('/api/grupos', [
-            'nombre' => 'Grupo B - Historia', 
-            'descripcion' => 'Grupo de historia general'
+            'nombre' => 'Grupo B', 
         ])->assertStatus(201);
 
         $grupoAId = $grupoA->json('id');
@@ -123,10 +121,10 @@ class AlumnoBehaviorTest extends TestCase
         // PASO 7: Admin verifica que el cambio se aplicó correctamente
         $verificacionResponse = $this->getJson("/api/alumnos/{$carlosId}");
         $verificacionResponse->assertStatus(200)
-                           ->assertJson([
-                               'nombre' => 'Carlos Rodríguez Silva',
-                               'grupo_id' => $grupoBId
-                           ]);
+                        ->assertJson([
+                            'nombre' => 'Carlos Rodríguez Silva',
+                            'grupo_id' => $grupoBId
+                        ]);
 
         // PASO 8: Admin consulta alumnos por grupo
         $grupoAResponse = $this->getJson("/api/grupos/{$grupoAId}/alumnos");
@@ -249,7 +247,7 @@ class AlumnoBehaviorTest extends TestCase
 
         $errorResponse = $this->postJson('/api/alumnos', $datosInvalidos);
         $errorResponse->assertStatus(422)
-                     ->assertJsonValidationErrors(['legajo', 'nombre', 'email', 'grupo_id']);
+                    ->assertJsonValidationErrors(['legajo', 'nombre', 'email', 'grupo_id']);
 
         // PASO 3: Usuario corrige errores uno por uno
         
@@ -257,33 +255,33 @@ class AlumnoBehaviorTest extends TestCase
         $datosCorreccion1 = array_merge($datosInvalidos, ['legajo' => 4001]);
         $response1 = $this->postJson('/api/alumnos', $datosCorreccion1);
         $response1->assertStatus(422)
-                  ->assertJsonMissingValidationErrors(['legajo'])
-                  ->assertJsonValidationErrors(['nombre', 'email', 'grupo_id']);
+                ->assertJsonMissingValidationErrors(['legajo'])
+                ->assertJsonValidationErrors(['nombre', 'email', 'grupo_id']);
 
         // Corrige nombre
         $datosCorreccion2 = array_merge($datosCorreccion1, ['nombre' => 'Alumno Corregido']);
         $response2 = $this->postJson('/api/alumnos', $datosCorreccion2);
         $response2->assertStatus(422)
-                  ->assertJsonMissingValidationErrors(['legajo', 'nombre'])
-                  ->assertJsonValidationErrors(['email', 'grupo_id']);
+                ->assertJsonMissingValidationErrors(['legajo', 'nombre'])
+                ->assertJsonValidationErrors(['email', 'grupo_id']);
 
         // Corrige email
         $datosCorreccion3 = array_merge($datosCorreccion2, ['email' => 'correcto@email.com']);
         $response3 = $this->postJson('/api/alumnos', $datosCorreccion3);
         $response3->assertStatus(422)
-                  ->assertJsonMissingValidationErrors(['legajo', 'nombre', 'email'])
-                  ->assertJsonValidationErrors(['grupo_id']);
+                ->assertJsonMissingValidationErrors(['legajo', 'nombre', 'email'])
+                ->assertJsonValidationErrors(['grupo_id']);
 
         // PASO 4: Corrige último error y crea exitosamente
         $datosCorrectos = array_merge($datosCorreccion3, ['grupo_id' => $grupoValido]);
         $successResponse = $this->postJson('/api/alumnos', $datosCorrectos);
         $successResponse->assertStatus(201)
-                       ->assertJson([
-                           'legajo' => 4001,
-                           'nombre' => 'Alumno Corregido',
-                           'email' => 'correcto@email.com',
-                           'grupo_id' => $grupoValido
-                       ]);
+                    ->assertJson([
+                        'legajo' => 4001,
+                        'nombre' => 'Alumno Corregido',
+                        'email' => 'correcto@email.com',
+                        'grupo_id' => $grupoValido
+                    ]);
 
         // PASO 5: Verifica que el alumno se creó correctamente
         $alumnoId = $successResponse->json('id');
@@ -350,18 +348,18 @@ class AlumnoBehaviorTest extends TestCase
 
         $consultaActualizada = $this->getJson("/api/alumnos/{$alumnoId}");
         $consultaActualizada->assertStatus(200)
-                           ->assertJson([
-                               'nombre' => 'Estudiante Colaborativo Actualizado',
-                               'email' => 'colaborativo.actualizado@test.com'
-                           ]);
+                        ->assertJson([
+                            'nombre' => 'Estudiante Colaborativo Actualizado',
+                            'email' => 'colaborativo.actualizado@test.com'
+                        ]);
 
         // PASO 6: Verificación final de consistencia
         $this->actingAs($this->adminUser);
         
         $verificacionFinal = $this->getJson("/api/alumnos/{$alumnoId}");
         $verificacionFinal->assertStatus(200)
-                         ->assertJson([
-                             'nombre' => 'Estudiante Colaborativo Actualizado'
-                         ]);
+                        ->assertJson([
+                            'nombre' => 'Estudiante Colaborativo Actualizado'
+                        ]);
     }
 }

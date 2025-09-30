@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\AlumnoController;
+use App\Http\Controllers\API\GrupoController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -24,4 +25,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('alumnos/{id}', [AlumnoController::class, 'update']);
     // Eliminar un alumno
     Route::delete('alumnos/{id}', [AlumnoController::class, 'destroy']);
+    
+    // CRUD de Grupos
+    Route::get('grupos', [GrupoController::class, 'index']);
+    Route::get('grupos/{id}', [GrupoController::class, 'show']);
+    Route::post('grupos', [GrupoController::class, 'store']);
+    Route::put('grupos/{id}', [GrupoController::class, 'update']);
+    Route::delete('grupos/{id}', [GrupoController::class, 'destroy']);
+    
+    // Obtener alumnos de un grupo
+    Route::get('grupos/{id}/alumnos', [GrupoController::class, 'alumnos']);
 });

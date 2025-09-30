@@ -62,8 +62,8 @@ class AlumnoTest extends BaseTestCase
     {
         // Arrange
         $grupo = Grupo::create([
-            'nombre' => 'Grupo A',
-            'descripcion' => 'Descripción del grupo A'
+            'nombre' => 'Grupo de Prueba',
+            'numero' => 100
         ]);
 
         $alumno = Alumno::create([
@@ -76,7 +76,7 @@ class AlumnoTest extends BaseTestCase
         // Act & Assert
         $this->assertInstanceOf(Grupo::class, $alumno->grupo);
         $this->assertEquals($grupo->id, $alumno->grupo->id);
-        $this->assertEquals('Grupo A', $alumno->grupo->nombre);
+        $this->assertEquals('Grupo de Prueba', $alumno->grupo->nombre);
     }
 
     /**
@@ -109,7 +109,7 @@ class AlumnoTest extends BaseTestCase
         // Arrange - Creamos el primer alumno
         Alumno::create([
             'legajo' => 11111,
-            'nombre' => 'Primer Alumno',
+            'nombre' => 'Pedro Pérez',
             'email' => 'primero@example.com',
             'grupo_id' => 1
         ]);
@@ -119,7 +119,7 @@ class AlumnoTest extends BaseTestCase
         
         Alumno::create([
             'legajo' => 11111,  // Mismo legajo
-            'nombre' => 'Segundo Alumno',
+            'nombre' => 'Pedro Pez',
             'email' => 'segundo@example.com',
             'grupo_id' => 1
         ]);
@@ -134,7 +134,7 @@ class AlumnoTest extends BaseTestCase
         // Arrange
         $alumno = Alumno::create([
             'legajo' => 77777,
-            'nombre' => 'Estudiante con Notas',
+            'nombre' => 'Pedro Pez',
             'email' => 'estudiante@example.com',
             'grupo_id' => 1
         ]);
