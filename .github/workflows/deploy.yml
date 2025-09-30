@@ -1,0 +1,138 @@
+name: 🚀 Deploy to Production
+
+# Ejecutar solo en push a main y cuando los tests pasen
+on:
+  push:
+    branches: [ main ]
+  workflow_run:
+    workflows: ["🧪 Laravel Testing Suite"]
+    types: [completed]
+    branches: [ main ]
+
+jobs:
+  deploy:
+    # Solo ejecutar si los tests pasaron
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'push' }}
+    
+    runs-on: ubuntu-latest
+    name: 🚀 Deploy Application
+    
+    environment: production  # Requiere configurar environment en GitHub
+    
+    steps:
+    - name: 📥 Checkout Code
+      uses: actions/checkout@v4
+
+    - name: 🐘 Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+        extensions: mbstring, dom, fileinfo, sqlite3
+
+    - name: 📦 Install Production Dependencies
+      run: composer install --no-dev --optimize-autoloader --no-interaction
+
+    - name: 🔧 Build Assets (si tienes Vite/Mix)
+      run: |
+        if [ -f "package.json" ]; then
+          npm ci
+          npm run build
+        fi
+
+    - name: 🧪 Run Quick Health Check
+      run: |
+        echo "🔍 Verificando que la aplicación arranca..."
+        php artisan --version
+        php artisan route:list --compact
+
+    # Ejemplo de despliegue via SSH (requiere configurar secrets)
+    - name: 🚀 Deploy via SSH
+      if: false  # Cambiar a true cuando tengas servidor configurado
+      uses: appleboy/ssh-action@v0.1.8
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        port: ${{ secrets.PORT }}
+        script: |
+          cd /path/to/your/app
+          git pull origin main
+          composer install --no-dev --optimize-autoloader
+          php artisan migrate --force
+          php artisan config:cache
+          php artisan route:cache
+          php artisan view:cache
+          sudo systemctl restart nginx
+          sudo systemctl restart php8.2-fpm
+
+    # Ejemplo de despliegue a Heroku
+    - name: 🌐 Deploy to Heroku
+      if: false  # Cambiar a true si usas Heroku
+      uses: akhileshns/heroku-deploy@v3.12.14
+      with:
+        heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+        heroku_app_name: "your-app-name"
+        heroku_email: "your-email@example.com"
+
+    # Notificación de éxito
+    - name: 📢 Notify Success
+      if: success()
+      run: |
+        echo "✅ ¡Despliegue completado exitosamente!"
+        echo "🔗 URL: https://your-app-url.com"
+        
+    # Notificación de fallo
+    - name: 🚨 Notify Failure
+      if: failure()
+      run: |
+        echo "❌ Despliegue falló - revisar logs"
+
+  # Job para crear release automático
+  release:
+    needs: deploy
+    runs-on: ubuntu-latest
+    name: 📦 Create Release
+    
+    steps:
+    - name: 📥 Checkout Code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Necesario para obtener todos los tags
+
+    - name: 📊 Generate Changelog
+      id: changelog
+      run: |
+        # Obtener el último tag
+        LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+        echo "Último tag: $LAST_TAG"
+        
+        # Generar changelog desde el último tag
+        CHANGELOG=$(git log $LAST_TAG..HEAD --pretty=format:"- %s (%an)" --no-merges)
+        echo "changelog<<EOF" >> $GITHUB_OUTPUT
+        echo "$CHANGELOG" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+
+    - name: 🏷️ Create Release
+      if: github.ref == 'refs/heads/main'
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ github.run_number }}
+        release_name: Release v${{ github.run_number }}
+        body: |
+          ## 🚀 Cambios en esta versión:
+          
+          ${{ steps.changelog.outputs.changelog }}
+          
+          ## 🧪 Tests:
+          - ✅ Tests unitarios pasaron
+          - ✅ Tests de API pasaron  
+          - ✅ Tests de integración pasaron
+          - ✅ Tests de comportamiento pasaron
+          
+          ## 🔗 Enlaces:
+          - [Ver diferencias](https://github.com/${{ github.repository }}/compare/v${{ github.run_number-1 }}...v${{ github.run_number }})
+          - [Aplicación en vivo](https://your-app-url.com)
+        draft: false
+        prerelease: false

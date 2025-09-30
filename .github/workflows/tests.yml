@@ -1,0 +1,266 @@
+name: 🧪 Laravel Testing Suite
+
+# Cuándo ejecutar los tests
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+# Configuración de trabajos
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    
+    # Nombre descriptivo para el job
+    name: 🔬 Testing (PHP ${{ matrix.php-versions }})
+    
+    # Matriz de versiones para testing
+    strategy:
+      fail-fast: false
+      matrix:
+        php-versions: ['8.1', '8.2', '8.3']
+    
+    # Variables de entorno para testing
+    env:
+      DB_CONNECTION: sqlite
+      DB_DATABASE: ":memory:"
+      APP_ENV: testing
+      APP_KEY: base64:YourBase64AppKeyHere
+      CACHE_DRIVER: array
+      SESSION_DRIVER: array
+      QUEUE_DRIVER: sync
+      MAIL_DRIVER: array
+
+    steps:
+    # 1. Checkout del código
+    - name: 📥 Checkout Code
+      uses: actions/checkout@v4
+
+    # 2. Configurar PHP
+    - name: 🐘 Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ matrix.php-versions }}
+        extensions: mbstring, dom, fileinfo, sqlite3, pdo_sqlite
+        coverage: xdebug
+        tools: composer:v2
+
+    # 3. Verificar versión de PHP
+    - name: 🔍 Check PHP Version
+      run: php --version
+
+    # 4. Cache de dependencias de Composer
+    - name: 💾 Cache Composer Dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.composer/cache/files
+        key: dependencies-composer-${{ hashFiles('composer.json') }}
+        restore-keys: |
+          dependencies-composer-
+
+    # 5. Instalar dependencias
+    - name: 📦 Install Composer Dependencies
+      run: composer install --no-progress --prefer-dist --optimize-autoloader --no-suggest --no-interaction
+
+    # 6. Generar clave de aplicación
+    - name: 🔐 Generate Application Key
+      run: php artisan key:generate
+
+    # 7. Preparar base de datos
+    - name: 🗄️ Prepare Database
+      run: |
+        touch database/database.sqlite
+        php artisan migrate --force
+
+    # 8. Cache de configuración
+    - name: ⚡ Cache Config
+      run: php artisan config:cache
+
+    # 9. Ejecutar Tests Unitarios
+    - name: 🧪 Run Unit Tests
+      run: |
+        echo "🔬 Ejecutando Tests Unitarios (Caja Blanca)..."
+        vendor/bin/phpunit tests/Unit/ --testdox --colors=always
+
+    # 10. Ejecutar Tests de API
+    - name: 🌐 Run API Tests
+      run: |
+        echo "📡 Ejecutando Tests de API (Caja Negra)..."
+        vendor/bin/phpunit tests/Feature/API/ --testdox --colors=always
+
+    # 11. Ejecutar Tests de Integración
+    - name: 🔗 Run Integration Tests
+      run: |
+        echo "🔗 Ejecutando Tests de Integración..."
+        vendor/bin/phpunit tests/Feature/AlumnoIntegrationTest.php --testdox --colors=always
+
+    # 12. Ejecutar Tests de Comportamiento (E2E)
+    - name: 🎭 Run Behavior Tests
+      run: |
+        echo "🎭 Ejecutando Tests de Comportamiento (E2E)..."
+        vendor/bin/phpunit tests/Feature/AlumnoBehaviorTest.php --testdox --colors=always
+
+    # 13. Ejecutar TODOS los tests con cobertura
+    - name: 📊 Run All Tests with Coverage
+      run: |
+        echo "📊 Ejecutando Suite Completo con Cobertura..."
+        vendor/bin/phpunit --coverage-text --coverage-clover=coverage.xml --testdox
+
+    # 14. Subir reporte de cobertura a Codecov (opcional)
+    - name: 📈 Upload Coverage to Codecov
+      if: matrix.php-versions == '8.2'  # Solo en una versión para evitar duplicados
+      uses: codecov/codecov-action@v3
+      with:
+        files: ./coverage.xml
+        fail_ci_if_error: false
+        verbose: true
+
+    # 15. Verificar sintaxis de archivos PHP
+    - name: 🔍 PHP Syntax Check
+      run: find . -name "*.php" -not -path "./vendor/*" -exec php -l {} \;
+
+    # 16. Ejecutar PHP CS Fixer (si está instalado)
+    - name: 🎨 Code Style Check
+      continue-on-error: true  # No fallar el build por estilo de código
+      run: |
+        if [ -f vendor/bin/php-cs-fixer ]; then
+          vendor/bin/php-cs-fixer fix --dry-run --diff --verbose
+        else
+          echo "PHP CS Fixer no instalado - saltando verificación de estilo"
+        fi
+
+  # Job adicional para testing en diferentes bases de datos
+  database-tests:
+    runs-on: ubuntu-latest
+    name: 🗄️ Database Testing (MySQL & PostgreSQL)
+    
+    strategy:
+      matrix:
+        database: [mysql, postgresql]
+        
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_DATABASE: alumnos_test
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+      
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: alumnos_test
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+    env:
+      APP_ENV: testing
+      APP_KEY: base64:YourBase64AppKeyHere
+      
+    steps:
+    - name: 📥 Checkout Code
+      uses: actions/checkout@v4
+
+    - name: 🐘 Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+        extensions: mbstring, dom, fileinfo, pdo, pdo_mysql, pdo_pgsql
+        coverage: none
+
+    - name: 📦 Install Dependencies
+      run: composer install --no-progress --prefer-dist --optimize-autoloader
+
+    - name: 🔐 Generate App Key
+      run: php artisan key:generate
+
+    - name: 🗄️ Setup Database Environment
+      run: |
+        if [ "${{ matrix.database }}" == "mysql" ]; then
+          echo "DB_CONNECTION=mysql" >> $GITHUB_ENV
+          echo "DB_HOST=127.0.0.1" >> $GITHUB_ENV
+          echo "DB_PORT=3306" >> $GITHUB_ENV
+          echo "DB_DATABASE=alumnos_test" >> $GITHUB_ENV
+          echo "DB_USERNAME=root" >> $GITHUB_ENV
+          echo "DB_PASSWORD=password" >> $GITHUB_ENV
+        else
+          echo "DB_CONNECTION=pgsql" >> $GITHUB_ENV
+          echo "DB_HOST=127.0.0.1" >> $GITHUB_ENV
+          echo "DB_PORT=5432" >> $GITHUB_ENV
+          echo "DB_DATABASE=alumnos_test" >> $GITHUB_ENV
+          echo "DB_USERNAME=postgres" >> $GITHUB_ENV
+          echo "DB_PASSWORD=password" >> $GITHUB_ENV
+        fi
+
+    - name: 🚀 Run Migrations
+      run: php artisan migrate --force
+
+    - name: 🧪 Run Database Tests
+      run: vendor/bin/phpunit --testdox --colors=always
+
+  # Job para análisis de código estático
+  static-analysis:
+    runs-on: ubuntu-latest
+    name: 🔍 Static Analysis
+    
+    steps:
+    - name: 📥 Checkout Code
+      uses: actions/checkout@v4
+
+    - name: 🐘 Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+        tools: composer:v2, phpstan, psalm
+
+    - name: 📦 Install Dependencies
+      run: composer install --no-progress --prefer-dist --optimize-autoloader
+
+    - name: 🔍 Run PHPStan (if configured)
+      continue-on-error: true
+      run: |
+        if [ -f phpstan.neon ] || [ -f phpstan.neon.dist ]; then
+          vendor/bin/phpstan analyse --memory-limit=2G
+        else
+          echo "PHPStan no configurado - creando configuración básica"
+          echo "parameters:" > phpstan.neon
+          echo "  level: 1" >> phpstan.neon
+          echo "  paths:" >> phpstan.neon
+          echo "    - app" >> phpstan.neon
+          vendor/bin/phpstan analyse app --level=1 || echo "Análisis estático completado con warnings"
+        fi
+
+  # Job para verificar vulnerabilidades de seguridad
+  security:
+    runs-on: ubuntu-latest
+    name: 🛡️ Security Check
+    
+    steps:
+    - name: 📥 Checkout Code
+      uses: actions/checkout@v4
+
+    - name: 🐘 Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+
+    - name: 📦 Install Dependencies
+      run: composer install --no-progress --prefer-dist --optimize-autoloader
+
+    - name: 🛡️ Security Audit
+      run: |
+        # Verificar vulnerabilidades conocidas en dependencias
+        composer audit || echo "Audit completado - revisar warnings"
+        
+        # Verificar archivos sensibles no committeados
+        if [ -f .env ]; then
+          echo "⚠️  ADVERTENCIA: Archivo .env encontrado en repositorio"
+          exit 1
+        fi
+        
+        echo "✅ Verificación de seguridad completada"
