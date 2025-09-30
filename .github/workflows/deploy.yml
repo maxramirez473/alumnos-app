@@ -43,7 +43,7 @@ jobs:
       run: |
         echo "🔍 Verificando que la aplicación arranca..."
         php artisan --version
-        php artisan route:list --compact
+        php artisan route:list
 
     # Ejemplo de despliegue via SSH (requiere configurar secrets)
     - name: 🚀 Deploy via SSH
