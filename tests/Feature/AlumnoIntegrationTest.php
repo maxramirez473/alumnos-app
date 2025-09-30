@@ -56,16 +56,16 @@ class AlumnoIntegrationTest extends TestCase
 
         // Act - Hacemos la petición HTTP al controlador
         $response = $this->actingAs($this->user)
-                         ->postJson('/api/alumnos', $datosAlumno);
+                        ->postJson('/api/alumnos', $datosAlumno);
 
         // Assert - Verificamos respuesta HTTP
         $response->assertStatus(201)
-                 ->assertJson([
-                     'legajo' => 88888,
-                     'nombre' => 'Integration Test Student',
-                     'email' => 'integration@test.com',
-                     'grupo_id' => $grupo->id
-                 ]);
+                ->assertJson([
+                    'legajo' => 88888,
+                    'nombre' => 'Integration Test Student',
+                    'email' => 'integration@test.com',
+                    'grupo_id' => $grupo->id
+                ]);
 
         // Assert - Verificamos que se guardó en base de datos
         $this->assertDatabaseHas('alumnos', $datosAlumno);
@@ -92,11 +92,11 @@ class AlumnoIntegrationTest extends TestCase
 
         // Act
         $response = $this->actingAs($this->user)
-                         ->postJson('/api/alumnos', $datosInvalidos);
+                        ->postJson('/api/alumnos', $datosInvalidos);
 
         // Assert - Debe retornar error de validación
         $response->assertStatus(422)
-                 ->assertJsonValidationErrors(['legajo', 'nombre', 'email', 'grupo_id']);
+                ->assertJsonValidationErrors(['legajo', 'nombre', 'email', 'grupo_id']);
 
         // Assert - No debe guardar nada en base de datos
         $this->assertDatabaseCount('alumnos', 0);
@@ -190,12 +190,12 @@ class AlumnoIntegrationTest extends TestCase
 
         // Act - Actualizamos el grupo del alumno
         $response = $this->actingAs($this->user)
-                         ->putJson("/api/alumnos/{$alumno->id}", [
-                             'legajo' => 2001,
-                             'nombre' => 'Alumno Movible Actualizado',
-                             'email' => 'movible@test.com',
-                             'grupo_id' => $grupo2->id
-                         ]);
+                        ->putJson("/api/alumnos/{$alumno->id}", [
+                            'legajo' => 2001,
+                            'nombre' => 'Alumno Movible Actualizado',
+                            'email' => 'movible@test.com',
+                            'grupo_id' => $grupo2->id
+                        ]);
 
         // Assert
         $response->assertStatus(200);
@@ -215,7 +215,7 @@ class AlumnoIntegrationTest extends TestCase
     public function test_eliminar_alumno_limpia_datos_relacionados()
     {
         // Arrange
-        $grupo = Grupo::create(['nombre' => 'Grupo Test', 'descripcion' => 'Test']);
+        $grupo = Grupo::create(['nombre' => 'Grupo Test', 'numero' => 1]);
         $alumno = Alumno::create([
             'legajo' => 3001,
             'nombre' => 'Alumno a Eliminar',
@@ -225,7 +225,7 @@ class AlumnoIntegrationTest extends TestCase
 
         // Act
         $response = $this->actingAs($this->user)
-                         ->deleteJson("/api/alumnos/{$alumno->id}");
+                        ->deleteJson("/api/alumnos/{$alumno->id}");
 
         // Assert
         $response->assertStatus(204);
@@ -235,5 +235,116 @@ class AlumnoIntegrationTest extends TestCase
         
         // Verificamos que el grupo sigue existiendo (no se elimina en cascada)
         $this->assertDatabaseHas('grupos', ['id' => $grupo->id]);
+    }
+
+    /**
+     * 🔐 NUEVO: Prueba middleware de autorización por roles - Usuario Admin
+     * Verifica que solo usuarios con rol 'admin' pueden eliminar alumnos vía web
+     */
+    public function test_solo_admin_puede_eliminar_alumno_via_web()
+    {
+        // Arrange - Crear usuario admin
+        $adminUser = User::factory()->create(['rol' => 'admin']);
+        
+        $grupo = Grupo::create(['nombre' => 'Grupo Test', 'numero' => 1]);
+        $alumno = Alumno::create([
+            'legajo' => 4001,
+            'nombre' => 'Alumno para Admin',
+            'email' => 'admin@test.com',
+            'grupo_id' => $grupo->id
+        ]);
+
+        // Act - Admin intenta eliminar vía ruta web (con middleware admin)
+        $response = $this->actingAs($adminUser)
+                        ->delete("/alumnos/{$alumno->id}");
+
+        // Assert - Admin PUEDE eliminar
+        $response->assertRedirect(); // Redirect después de eliminación exitosa
+        $this->assertDatabaseMissing('alumnos', ['id' => $alumno->id]);
+    }
+
+    /**
+     * 🚫 NUEVO: Prueba middleware de autorización por roles - Usuario Regular
+     * Verifica que usuarios regulares NO pueden eliminar alumnos vía web
+     */
+    public function test_usuario_regular_no_puede_eliminar_alumno_via_web()
+    {
+        // Arrange - Crear usuario regular (sin rol admin)
+        $regularUser = User::factory()->create(['rol' => 'user']);
+        
+        $grupo = Grupo::create(['nombre' => 'Grupo Test', 'numero' => 1]);
+        $alumno = Alumno::create([
+            'legajo' => 5001,
+            'nombre' => 'Alumno Protegido',
+            'email' => 'protegido@test.com',
+            'grupo_id' => $grupo->id
+        ]);
+
+        // Act - Usuario regular intenta eliminar vía ruta web
+        $response = $this->actingAs($regularUser)
+                        ->delete("/alumnos/{$alumno->id}");
+
+        // Assert - Usuario regular NO PUEDE eliminar
+        $response->assertStatus(403); // Forbidden
+        
+        // Verificamos que el alumno sigue existiendo
+        $this->assertDatabaseHas('alumnos', ['id' => $alumno->id]);
+    }
+
+    /**
+     * 🔐 NUEVO: Prueba autorización en rutas API - Comparación
+     * Nota: Las rutas API actualmente NO tienen middleware de roles
+     * Este test documenta el comportamiento actual
+     */
+    public function test_api_no_tiene_restricciones_de_rol_actualmente()
+    {
+        // Arrange - Usuario regular
+        $regularUser = User::factory()->create(['rol' => 'user']);
+        
+        $grupo = Grupo::create(['nombre' => 'Grupo API Test', 'numero' => 1]);
+        $alumno = Alumno::create([
+            'legajo' => 6001,
+            'nombre' => 'Alumno API',
+            'email' => 'api@test.com',
+            'grupo_id' => $grupo->id
+        ]);
+
+        // Act - Usuario regular elimina vía API (sin middleware de roles)
+        $response = $this->actingAs($regularUser)
+                        ->deleteJson("/api/alumnos/{$alumno->id}");
+
+        // Assert - API permite eliminación sin verificar rol
+        $response->assertStatus(204);
+        
+        // IMPORTANTE: Esto demuestra una inconsistencia de seguridad
+        // Las rutas web requieren admin, pero las API no
+        $this->assertDatabaseMissing('alumnos', ['id' => $alumno->id]);
+        
+        // TODO: Agregar middleware 'admin' a rutas API de eliminación
+    }
+
+    /**
+     * 🔐 NUEVO: Prueba de acceso sin autenticación
+     * Verifica que usuarios no autenticados no pueden eliminar
+     */
+    public function test_usuario_no_autenticado_no_puede_eliminar()
+    {
+        // Arrange
+        $grupo = Grupo::create(['nombre' => 'Grupo Test', 'numero' => 1]);
+        $alumno = Alumno::create([
+            'legajo' => 7001,
+            'nombre' => 'Alumno Sin Auth',
+            'email' => 'sinauth@test.com',
+            'grupo_id' => $grupo->id
+        ]);
+
+        // Act - Sin autenticación, intentar eliminar vía web
+        $response = $this->delete("/alumnos/{$alumno->id}");
+
+        // Assert - Debe redirigir a login
+        $response->assertRedirect('/login');
+        
+        // Verificamos que el alumno sigue existiendo
+        $this->assertDatabaseHas('alumnos', ['id' => $alumno->id]);
     }
 }

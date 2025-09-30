@@ -275,7 +275,298 @@ class TuModeloTest extends TestCase
 
 ---
 
-## 🔬 **TESTING UNITARIO (Caja Blanca)**
+## � **MÉTODOS DE CONFIGURACIÓN DE TESTS**
+
+### **🔧 setUp() - Preparación Antes de Cada Test**
+
+#### **¿Qué es setUp()?**
+- **Método especial** que PHPUnit ejecuta **automáticamente ANTES de cada test**
+- Se usa para **preparar el estado inicial** que todos los tests necesitan
+- **Evita duplicar código** de configuración en cada test
+
+#### **⚡ Flujo de Ejecución:**
+```
+Para CADA test individual:
+1. setUp() se ejecuta ← AQUÍ SE PREPARA TODO
+2. El método de test se ejecuta
+3. tearDown() se ejecuta (limpieza)
+4. Se repite para el siguiente test
+```
+
+#### **📋 Ejemplo Práctico - API Testing:**
+
+```php
+<?php
+namespace Tests\Feature\API;
+
+use Tests\TestCase;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+class AlumnoApiTest extends TestCase
+{
+    use RefreshDatabase;
+    
+    private $headers;
+    private $baseUrl = '/api/alumnos';
+    
+    protected function setUp(): void
+    {
+        // ⚠️ SIEMPRE llamar parent::setUp() primero
+        parent::setUp();
+        
+        // 1. Configurar headers HTTP para todas las peticiones
+        $this->headers = [
+            'Accept' => 'application/json',
+            'Content-Type' => 'application/json',
+        ];
+        
+        // 2. Crear usuario y token de autenticación automáticamente
+        $user = User::factory()->create();
+        $token = $user->createToken('test-token')->plainTextToken;
+        $this->headers['Authorization'] = "Bearer {$token}";
+        
+        // 3. Crear datos de prueba que todos los tests pueden usar
+        $this->testGrupo = \App\Models\Grupo::create([
+            'nombre' => 'Grupo Test',
+            'numero' => 1
+        ]);
+    }
+    
+    public function test_crear_alumno()
+    {
+        // Ya tenemos $this->headers con autenticación
+        // Ya tenemos $this->testGrupo disponible
+        
+        $payload = [
+            'legajo' => 12345,
+            'nombre' => 'Test Student',
+            'email' => 'test@example.com',
+            'grupo_id' => $this->testGrupo->id  // ← Usa el grupo creado en setUp()
+        ];
+        
+        $response = $this->postJson($this->baseUrl, $payload, $this->headers);
+        $response->assertStatus(201);
+    }
+    
+    public function test_obtener_alumnos()
+    {
+        // De nuevo, headers y testGrupo ya están disponibles
+        $response = $this->getJson($this->baseUrl, $this->headers);
+        $response->assertStatus(200);
+    }
+}
+```
+
+#### **✅ Ventajas de usar setUp():**
+
+1. **DRY (Don't Repeat Yourself)**:
+   ```php
+   // ❌ SIN setUp() - Repetir en cada test
+   public function test_crear_alumno() {
+       $user = User::factory()->create();
+       $token = $user->createToken('test')->plainTextToken;
+       $headers = ['Authorization' => "Bearer {$token}"];
+       // ... resto del test
+   }
+   
+   public function test_actualizar_alumno() {
+       $user = User::factory()->create(); // ← DUPLICADO
+       $token = $user->createToken('test')->plainTextToken; // ← DUPLICADO
+       $headers = ['Authorization' => "Bearer {$token}"]; // ← DUPLICADO
+       // ... resto del test
+   }
+   ```
+   
+   ```php
+   // ✅ CON setUp() - Una sola vez
+   protected function setUp(): void {
+       parent::setUp();
+       $user = User::factory()->create();
+       $this->token = $user->createToken('test')->plainTextToken;
+   }
+   ```
+
+2. **Consistencia**: Todos los tests tienen exactamente el mismo estado inicial
+3. **Mantenibilidad**: Cambios en la configuración se hacen en un solo lugar
+4. **Legibilidad**: Los tests se enfocan en su lógica específica
+
+#### **📚 Casos de Uso Comunes para setUp():**
+
+```php
+protected function setUp(): void
+{
+    parent::setUp();
+    
+    // Autenticación automática
+    $this->user = User::factory()->create();
+    $this->actingAs($this->user);
+    
+    // Configurar mocks
+    $this->mockExternalService = $this->createMock(ExternalService::class);
+    $this->app->instance(ExternalService::class, $this->mockExternalService);
+    
+    // Configurar entorno específico
+    config(['app.debug' => false]);
+    config(['mail.driver' => 'log']);
+    
+    // Limpiar cachés
+    Cache::flush();
+    Queue::fake();
+    
+    // Seedear datos específicos necesarios para todos los tests
+    $this->seed(RequiredDataSeeder::class);
+    
+    // Crear datos de prueba compartidos
+    $this->defaultGrupo = Grupo::create(['nombre' => 'Default', 'numero' => 1]);
+}
+```
+
+### **🧹 tearDown() - Limpieza Después de Cada Test**
+
+#### **¿Qué es tearDown()?**
+- Método que se ejecuta **DESPUÉS de cada test** para hacer limpieza
+- Laravel con `RefreshDatabase` hace limpieza automática, pero a veces necesitas limpieza custom
+
+```php
+protected function tearDown(): void
+{
+    // Limpieza específica si es necesaria
+    if (isset($this->tempFile)) {
+        unlink($this->tempFile);
+    }
+    
+    // Cerrar conexiones externas
+    if (isset($this->externalConnection)) {
+        $this->externalConnection->close();
+    }
+    
+    // Reset de singletons globales
+    SomeGlobalService::reset();
+    
+    // ⚠️ SIEMPRE llamar parent::tearDown() al final
+    parent::tearDown();
+}
+```
+
+### **🎯 Ejemplo Completo - Comparación Con/Sin setUp()**
+
+#### **❌ MAL - Sin setUp() (código repetitivo):**
+```php
+class AlumnoTestSinSetup extends TestCase
+{
+    public function test_crear_alumno() {
+        // Repetir configuración completa
+        $user = User::factory()->create();
+        $token = $user->createToken('test')->plainTextToken;
+        $headers = ['Authorization' => "Bearer {$token}", 'Accept' => 'application/json'];
+        $grupo = Grupo::create(['nombre' => 'Test', 'numero' => 1]);
+        
+        // Aquí recién empieza el test real...
+        $response = $this->postJson('/api/alumnos', $data, $headers);
+    }
+    
+    public function test_actualizar_alumno() {
+        // Repetir TODO otra vez ❌
+        $user = User::factory()->create();
+        $token = $user->createToken('test')->plainTextToken;
+        $headers = ['Authorization' => "Bearer {$token}", 'Accept' => 'application/json'];
+        $grupo = Grupo::create(['nombre' => 'Test', 'numero' => 1]);
+        
+        // Test real...
+    }
+    
+    public function test_eliminar_alumno() {
+        // Y otra vez... ❌
+        $user = User::factory()->create();
+        // ... etc
+    }
+}
+```
+
+#### **✅ BIEN - Con setUp() (limpio y mantenible):**
+```php
+class AlumnoTestConSetup extends TestCase
+{
+    protected function setUp(): void
+    {
+        parent::setUp();
+        
+        // Una sola configuración para TODOS los tests
+        $user = User::factory()->create();
+        $token = $user->createToken('test')->plainTextToken;
+        $this->headers = [
+            'Authorization' => "Bearer {$token}",
+            'Accept' => 'application/json'
+        ];
+        $this->testGrupo = Grupo::create(['nombre' => 'Test', 'numero' => 1]);
+    }
+    
+    public function test_crear_alumno() {
+        // Directo al grano - usar configuración ya lista
+        $response = $this->postJson('/api/alumnos', $data, $this->headers);
+        $response->assertStatus(201);
+    }
+    
+    public function test_actualizar_alumno() {
+        // Limpio y enfocado en el test específico
+        $alumno = $this->crearAlumnoBase();
+        $response = $this->putJson("/api/alumnos/{$alumno->id}", $data, $this->headers);
+        $response->assertStatus(200);
+    }
+    
+    public function test_eliminar_alumno() {
+        // Headers y grupo ya disponibles
+        $alumno = $this->crearAlumnoBase();
+        $response = $this->deleteJson("/api/alumnos/{$alumno->id}", [], $this->headers);
+        $response->assertStatus(204);
+    }
+}
+```
+
+### **⚠️ Consideraciones Importantes:**
+
+1. **`parent::setUp()` SIEMPRE primero:**
+   ```php
+   protected function setUp(): void
+   {
+       parent::setUp(); // ← OBLIGATORIO y PRIMERO
+       // Tu configuración después...
+   }
+   ```
+
+2. **Estado limpio entre tests:**
+   - Con `RefreshDatabase`, cada test comienza con BD vacía
+   - `setUp()` se ejecuta para CADA test individual
+   - No hay estado compartido entre tests
+
+3. **Propiedades de instancia:**
+   ```php
+   class MiTest extends TestCase 
+   {
+       private $user;        // ← Disponible en todos los métodos
+       private $headers;     // ← del test después de setUp()
+       private $testData;
+       
+       protected function setUp(): void {
+           parent::setUp();
+           $this->user = User::factory()->create();
+           $this->headers = ['Authorization' => 'Bearer ' . $this->user->createToken('test')->plainTextToken];
+       }
+   }
+   ```
+
+4. **Tests independientes:**
+   ```php
+   // Cada test es completamente independiente:
+   Test 1: setUp() → test_crear() → tearDown()
+   Test 2: setUp() → test_actualizar() → tearDown() 
+   Test 3: setUp() → test_eliminar() → tearDown()
+   ```
+
+---
+
+## �🔬 **TESTING UNITARIO (Caja Blanca)**
 
 ### **¿Qué es?**
 - Prueba **componentes individuales** de forma aislada
