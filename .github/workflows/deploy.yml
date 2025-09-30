@@ -103,11 +103,23 @@ jobs:
       id: changelog
       run: |
         # Obtener el último tag
-        LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
-        echo "Último tag: $LAST_TAG"
+        LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null)
         
-        # Generar changelog desde el último tag
-        CHANGELOG=$(git log $LAST_TAG..HEAD --pretty=format:"- %s (%an)" --no-merges)
+        if [ -z "$LAST_TAG" ]; then
+          echo "📝 No hay tags previos - generando changelog desde el primer commit"
+          # Si no hay tags, obtener todos los commits
+          CHANGELOG=$(git log --pretty=format:"- %s (%an)" --no-merges --max-count=20)
+        else
+          echo "📝 Último tag encontrado: $LAST_TAG"
+          # Generar changelog desde el último tag
+          CHANGELOG=$(git log $LAST_TAG..HEAD --pretty=format:"- %s (%an)" --no-merges)
+        fi
+        
+        # Si no hay commits nuevos, mostrar mensaje por defecto
+        if [ -z "$CHANGELOG" ]; then
+          CHANGELOG="- Despliegue de mantenimiento (Sin cambios significativos)"
+        fi
+        
         echo "changelog<<EOF" >> $GITHUB_OUTPUT
         echo "$CHANGELOG" >> $GITHUB_OUTPUT
         echo "EOF" >> $GITHUB_OUTPUT
@@ -132,7 +144,7 @@ jobs:
           - ✅ Tests de comportamiento pasaron
           
           ## 🔗 Enlaces:
-          - [Ver diferencias](https://github.com/${{ github.repository }}/compare/v${{ github.run_number-1 }}...v${{ github.run_number }})
+          - [Ver todos los commits](https://github.com/${{ github.repository }}/commits/main)
           - [Aplicación en vivo](https://your-app-url.com)
         draft: false
         prerelease: false
