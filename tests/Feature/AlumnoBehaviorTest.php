@@ -9,11 +9,11 @@ use App\Models\Grupo;
 use App\Models\Alumno;
 
 /**
- * Testing de Comportamiento (End-to-End / E2E)
+ *  Testing de Comportamiento (End-to-End / E2E)
  * 
- * Simula flujos completos de usuario desde inicio hasta fin
- * Incluye múltiples pasos y verificaciones de estado
- * Prueba escenarios reales de uso de la aplicación
+ *  Simula flujos completos de usuario desde inicio hasta fin
+ *  Incluye múltiples pasos y verificaciones de estado
+ *  Prueba escenarios reales de uso de la aplicación
  */
 class AlumnoBehaviorTest extends TestCase
 {
@@ -41,10 +41,10 @@ class AlumnoBehaviorTest extends TestCase
     }
 
     /**
-     * E2E: Flujo completo de gestión de alumnos por un administrador
+     *  E2E: Flujo completo de gestión de alumnos por un administrador
      * 
-     * Historia de usuario:
-     * "Como administrador, quiero gestionar alumnos completos 
+     *  Historia de usuario:
+     *  "Como administrador, quiero gestionar alumnos completos 
      *  para organizar mi institución educativa"
      */
     public function test_flujo_completo_gestion_alumnos_como_admin()
@@ -157,10 +157,10 @@ class AlumnoBehaviorTest extends TestCase
     }
 
     /**
-     * E2E: Flujo de inscripción masiva de alumnos
+     *  E2E: Flujo de inscripción masiva de alumnos
      * 
-     * Historia de usuario:
-     * "Como administrador, quiero poder inscribir múltiples alumnos 
+     *  Historia de usuario:
+     *  "Como administrador, quiero poder inscribir múltiples alumnos 
      *  de forma eficiente al inicio del período académico"
      */
     public function test_flujo_inscripcion_masiva_inicio_semestre()
@@ -171,8 +171,7 @@ class AlumnoBehaviorTest extends TestCase
         $grupos = [];
         for ($i = 1; $i <= 3; $i++) {
             $response = $this->postJson('/api/grupos', [
-                'nombre' => "Curso {$i}° Año",
-                'descripcion' => "Estudiantes de {$i}° año"
+                'nombre' => "Curso {$i}° Año"
             ]);
             $grupos[] = $response->json('id');
         }
@@ -220,10 +219,10 @@ class AlumnoBehaviorTest extends TestCase
     }
 
     /**
-     * E2E: Flujo de manejo de errores y recuperación
+     *  E2E: Flujo de manejo de errores y recuperación
      * 
-     * Historia de usuario:
-     * "Como usuario del sistema, cuando cometo errores, 
+     *  Historia de usuario:
+     *  "Como usuario del sistema, cuando cometo errores, 
      *  quiero recibir mensajes claros y poder corregirlos fácilmente"
      */
     public function test_flujo_manejo_errores_y_recuperacion()
@@ -232,8 +231,7 @@ class AlumnoBehaviorTest extends TestCase
 
         // PASO 1: Crear grupo válido primero
         $grupoResponse = $this->postJson('/api/grupos', [
-            'nombre' => 'Grupo Válido',
-            'descripcion' => 'Grupo para testing de errores'
+            'nombre' => 'Grupo Válido'
         ]);
         $grupoValido = $grupoResponse->json('id');
 
@@ -302,8 +300,7 @@ class AlumnoBehaviorTest extends TestCase
         $this->actingAs($this->adminUser);
 
         $grupoResponse = $this->postJson('/api/grupos', [
-            'nombre' => 'Matemáticas Avanzadas',
-            'descripcion' => 'Curso de matemáticas para nivel avanzado'
+            'nombre' => 'Matemáticas Avanzadas'
         ]);
         $grupoId = $grupoResponse->json('id');
 

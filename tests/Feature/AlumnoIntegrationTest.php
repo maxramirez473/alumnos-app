@@ -43,8 +43,7 @@ class AlumnoIntegrationTest extends TestCase
     {
         // Arrange
         $grupo = Grupo::create([
-            'nombre' => 'Grupo Test',
-            'descripcion' => 'Grupo para testing'
+            'nombre' => 'Grupo Test'
         ]);
 
         $datosAlumno = [
@@ -131,8 +130,8 @@ class AlumnoIntegrationTest extends TestCase
     public function test_busqueda_alumnos_con_filtros()
     {
         // Arrange - Creamos varios alumnos
-        $grupo1 = Grupo::create(['nombre' => 'Grupo 1', 'descripcion' => 'Desc 1']);
-        $grupo2 = Grupo::create(['nombre' => 'Grupo 2', 'descripcion' => 'Desc 2']);
+        $grupo1 = Grupo::create(['nombre' => 'Grupo 1']);
+        $grupo2 = Grupo::create(['nombre' => 'Grupo 2']);
 
         Alumno::create([
             'legajo' => 1001,
@@ -178,8 +177,8 @@ class AlumnoIntegrationTest extends TestCase
     public function test_actualizar_alumno_cambia_grupo()
     {
         // Arrange
-        $grupo1 = Grupo::create(['nombre' => 'Grupo Original', 'descripcion' => 'Desc 1']);
-        $grupo2 = Grupo::create(['nombre' => 'Grupo Nuevo', 'descripcion' => 'Desc 2']);
+        $grupo1 = Grupo::create(['nombre' => 'Grupo Original']);
+        $grupo2 = Grupo::create(['nombre' => 'Grupo Nuevo']);
 
         $alumno = Alumno::create([
             'legajo' => 2001,

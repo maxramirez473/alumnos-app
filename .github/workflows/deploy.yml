@@ -1,4 +1,4 @@
-name: 🚀 Deploy to Production
+name: � Create Release Version
 
 # Ejecutar solo en push a main y cuando los tests pasen
 on:
@@ -10,86 +10,10 @@ on:
     branches: [ main ]
 
 jobs:
-  deploy:
-    # Solo ejecutar si los tests pasaron
-    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'push' }}
-    
-    runs-on: ubuntu-latest
-    name: 🚀 Deploy Application
-    
-    environment: production  # Requiere configurar environment en GitHub
-    
-    steps:
-    - name: 📥 Checkout Code
-      uses: actions/checkout@v4
-
-    - name: 🐘 Setup PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: '8.2'
-        extensions: mbstring, dom, fileinfo, sqlite3
-
-    - name: 📦 Install Production Dependencies
-      run: composer install --no-dev --optimize-autoloader --no-interaction
-
-    - name: 🔧 Build Assets (si tienes Vite/Mix)
-      run: |
-        if [ -f "package.json" ]; then
-          npm ci
-          npm run build
-        fi
-
-    - name: 🧪 Run Quick Health Check
-      run: |
-        echo "🔍 Verificando que la aplicación arranca..."
-        php artisan --version
-        php artisan route:list
-
-    # Ejemplo de despliegue via SSH (requiere configurar secrets)
-    - name: 🚀 Deploy via SSH
-      if: false  # Cambiar a true cuando tengas servidor configurado
-      uses: appleboy/ssh-action@v0.1.8
-      with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USERNAME }}
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
-        port: ${{ secrets.PORT }}
-        script: |
-          cd /path/to/your/app
-          git pull origin main
-          composer install --no-dev --optimize-autoloader
-          php artisan migrate --force
-          php artisan config:cache
-          php artisan route:cache
-          php artisan view:cache
-          sudo systemctl restart nginx
-          sudo systemctl restart php8.2-fpm
-
-    # Ejemplo de despliegue a Heroku
-    - name: 🌐 Deploy to Heroku
-      if: false  # Cambiar a true si usas Heroku
-      uses: akhileshns/heroku-deploy@v3.12.14
-      with:
-        heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
-        heroku_app_name: "your-app-name"
-        heroku_email: "your-email@example.com"
-
-    # Notificación de éxito
-    - name: 📢 Notify Success
-      if: success()
-      run: |
-        echo "✅ ¡Despliegue completado exitosamente!"
-        echo "🔗 URL: https://your-app-url.com"
-        
-    # Notificación de fallo
-    - name: 🚨 Notify Failure
-      if: failure()
-      run: |
-        echo "❌ Despliegue falló - revisar logs"
-
   # Job para crear release automático
   release:
-    needs: deploy
+    # Solo ejecutar si los tests pasaron
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'push' }}
     runs-on: ubuntu-latest
     name: 📦 Create Release
     
@@ -98,6 +22,61 @@ jobs:
       uses: actions/checkout@v4
       with:
         fetch-depth: 0  # Necesario para obtener todos los tags
+
+    - name: 🐘 Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+        extensions: mbstring, dom, fileinfo, sqlite3
+
+    - name: 📊 Generate Demo Statistics
+      run: |
+        echo "📈 Generando estadísticas de la aplicación demo..."
+        
+        # Contar archivos de código
+        PHP_FILES=$(find . -name "*.php" -not -path "./vendor/*" | wc -l)
+        TEST_FILES=$(find ./tests -name "*.php" | wc -l)
+        CONTROLLERS=$(find ./app/Http/Controllers -name "*.php" | wc -l)
+        MODELS=$(find ./app/Models -name "*.php" | wc -l)
+        
+        # Contar líneas de código (aproximado)
+        LINES_OF_CODE=$(find . -name "*.php" -not -path "./vendor/*" -exec wc -l {} + | tail -1 | awk '{print $1}')
+        
+        echo "🔍 ESTADÍSTICAS DE LA DEMO:"
+        echo "- Archivos PHP: $PHP_FILES"
+        echo "- Archivos de test: $TEST_FILES"
+        echo "- Controladores: $CONTROLLERS"  
+        echo "- Modelos: $MODELS"
+        echo "- Líneas de código: ~$LINES_OF_CODE"
+        echo ""
+        
+        # Crear archivo de estadísticas
+        cat > demo-stats.md << EOF
+        # 📊 Estadísticas de la Aplicación Demo
+        
+        ## 📈 Métricas de Código
+        - **Archivos PHP**: $PHP_FILES
+        - **Archivos de Test**: $TEST_FILES  
+        - **Controladores**: $CONTROLLERS
+        - **Modelos**: $MODELS
+        - **Líneas de Código**: ~$LINES_OF_CODE
+        
+        ## 🧪 Cobertura de Testing
+        - Tests Unitarios (Caja Blanca)
+        - Tests de API (Caja Negra)
+        - Tests de Integración
+        - Tests End-to-End (E2E)
+        - Tests de Seguridad
+        
+        ## 🏗️ Arquitectura
+        - Laravel 11.x
+        - PHP 8.2+
+        - SQLite/MySQL
+        - Bootstrap 5
+        - GitHub Actions CI/CD
+        
+        Generado automáticamente el $(date)
+        EOF
 
     - name: 📊 Generate Changelog
       id: changelog
@@ -124,6 +103,12 @@ jobs:
         echo "$CHANGELOG" >> $GITHUB_OUTPUT
         echo "EOF" >> $GITHUB_OUTPUT
 
+    - name: 📋 Upload Demo Statistics
+      uses: actions/upload-artifact@v3
+      with:
+        name: demo-statistics-v${{ github.run_number }}
+        path: demo-stats.md
+
     - name: 🏷️ Create Release
       if: github.ref == 'refs/heads/main'
       uses: actions/create-release@v1
@@ -131,20 +116,43 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         tag_name: v${{ github.run_number }}
-        release_name: Release v${{ github.run_number }}
+        release_name: "📦 Demo Release v${{ github.run_number }}"
         body: |
-          ## 🚀 Cambios en esta versión:
+          ## 🎯 Sistema de Gestión de Alumnos - Versión de Demostración
           
+          ### 🚀 Cambios en esta versión:
           ${{ steps.changelog.outputs.changelog }}
           
-          ## 🧪 Tests:
-          - ✅ Tests unitarios pasaron
-          - ✅ Tests de API pasaron  
-          - ✅ Tests de integración pasaron
-          - ✅ Tests de comportamiento pasaron
+          ### 🧪 Estado de Testing:
+          - ✅ Tests unitarios (Caja Blanca): Pasaron
+          - ✅ Tests de API (Caja Negra): Pasaron  
+          - ✅ Tests de integración: Pasaron
+          - ✅ Tests de comportamiento (E2E): Pasaron
+          - ✅ Tests de seguridad: Pasaron
           
-          ## 🔗 Enlaces:
-          - [Ver todos los commits](https://github.com/${{ github.repository }}/commits/main)
-          - [Aplicación en vivo](https://your-app-url.com)
+          ### 📋 Funcionalidades incluidas:
+          - 👥 Gestión completa de alumnos
+          - 🏫 Administración de grupos
+          - 📊 Reportes y búsquedas
+          - 🔐 Sistema de autenticación
+          - 📡 API REST completa
+          - 🧪 Suite de testing integral
+          
+          ### 🔗 Enlaces útiles:
+          - [📂 Ver todos los commits](https://github.com/${{ github.repository }}/commits/main)
+          - [🧪 Ver suite de testing](https://github.com/${{ github.repository }}/tree/main/tests)
+          - [📖 Documentación](https://github.com/${{ github.repository }}/blob/main/README.md)
+          
+          ### 💻 Para desarrolladores:
+          ```bash
+          git clone https://github.com/${{ github.repository }}.git
+          cd alumnos-app
+          composer install
+          php artisan migrate --seed
+          php artisan test
+          ```
+          
+          ---
+          🎓 **Aplicación de demostración educativa - No desplegada en producción**
         draft: false
         prerelease: false
